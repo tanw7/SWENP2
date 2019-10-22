@@ -9,7 +9,7 @@ import utilities.Coordinate;
 public class mapRecorder {
 	
 	public enum TileType {
-		WALL, ROAD, PARCEL, START, EXIT, UNREACHABLE
+		WALL, ROAD, PARCEL, START, EXIT, NOTREACHED
 	}
 	
 	public MapTile[][] map;
@@ -23,7 +23,13 @@ public class mapRecorder {
 		map = new MapTile[MAP_WIDTH][MAP_HEIGHT];
 		tileType = new TileType[MAP_WIDTH][MAP_HEIGHT];
 		
-		
+		for (int i = 0; i<MAP_WIDTH; i++) {
+			for (int j = 0; j< MAP_HEIGHT; j++) {
+				if(map[i][j] == null) {
+					tileType[i][j] = TileType.NOTREACHED;
+				}
+			}
+		}
 		
 	}
 	
@@ -33,6 +39,7 @@ public class mapRecorder {
 		for(Map.Entry<Coordinate, MapTile> entry : Carview.entrySet()) {
 			int carX = entry.getKey().x;
 			int carY = entry.getKey().y;
+			
 			
 		}
 	}
