@@ -16,5 +16,15 @@ public class Tree<T> {
         public T data;
         public Node<T> parent;
         public ArrayList<Node<T>> children;
+        
+        public Node<T> addChild(Node<T> child) {
+        		child.setParent(this);
+        		this.children.add(child);
+        		return child;
+        }
+       
+        public void setParent(Node<T> parent) {
+        		this.parent = parent;
+        }
     }
 }
