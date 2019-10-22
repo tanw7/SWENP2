@@ -4,30 +4,37 @@ import java.util.HashMap;
 import java.util.Map;
 
 import tiles.MapTile;
-import tiles.MapTile.Type;
 import utilities.Coordinate;
 
-public class mapRecorder {
+public class MapRecorder {
 	
-
+	public enum TileType {
+		SEARCHED, UNSEARCHED, WALL
+	}
 	
 	public MapTile[][] map;
-	public Type[][] type;
+	public TileType[][] tileType;
 	
 	public static final int MAP_WIDTH = World.MAP_WIDTH;
 	public static final int MAP_HEIGHT = World.MAP_HEIGHT;
 	
-	public mapRecorder(HashMap<Coordinate, MapTile> m_hashMap) {
+	public MapRecorder(HashMap<Coordinate, MapTile> m_hashMap) {
 		// TODO Auto-generated constructor stub
 		map = new MapTile[MAP_WIDTH][MAP_HEIGHT];
-		type = new Type[MAP_WIDTH][MAP_HEIGHT];
+		tileType = new TileType[MAP_WIDTH][MAP_HEIGHT];
 		
+		for (Map.Entry<Coordinate, MapTile> entry : m_hashMap.entrySet()) {
+			int i = entry.getKey().x;
+			int j = entry.getKey().y;
+			
+			map[i][j] = entry.getValue();
+		}
 		
 	
 		for (int i = 0; i<MAP_WIDTH; i++) {
 			for (int j = 0; j< MAP_HEIGHT; j++) {
 				if(map[i][j] == null) {
-					type[i][j] = Type.EMPTY;
+					tileType[i][j] = TileType.UNSEARCHED;
 				}
 			}
 		}
@@ -42,7 +49,7 @@ public class mapRecorder {
 			int carY = entry.getKey().y;
 			
 			if (!TileOutOfRange(carX, carY)) {
-				type[carX][carY] = entry.getValue().getType();
+				tileType[carX][carY] = TileType.SEARCHED;
 				map[carX][carY] = entry.getValue();
 			}
 			
