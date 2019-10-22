@@ -12,6 +12,7 @@ public class MapRecorder {
 		SEARCHED, UNSEARCHED, WALL
 	}
 	
+	public int[][] maze;
 	public MapTile[][] map;
 	public TileType[][] tileType;
 	
@@ -20,6 +21,7 @@ public class MapRecorder {
 	
 	public MapRecorder(HashMap<Coordinate, MapTile> m_hashMap) {
 		// TODO Auto-generated constructor stub
+		maze = new int[MAP_WIDTH][MAP_HEIGHT];
 		map = new MapTile[MAP_WIDTH][MAP_HEIGHT];
 		tileType = new TileType[MAP_WIDTH][MAP_HEIGHT];
 		
@@ -33,8 +35,10 @@ public class MapRecorder {
 	
 		for (int i = 0; i<MAP_WIDTH; i++) {
 			for (int j = 0; j< MAP_HEIGHT; j++) {
-				if(map[i][j] == null) {
-					tileType[i][j] = TileType.UNSEARCHED;
+				if(map[i][j].isType(MapTile.Type.WALL)) {
+					maze[i][j] = 100;
+				} else {
+					maze[i][j] = 0;
 				}
 			}
 		}
@@ -59,5 +63,6 @@ public class MapRecorder {
 	public boolean TileOutOfRange(int x, int y) {
 		return (x<0 || x > MAP_WIDTH || y <0 || y > MAP_HEIGHT);
 	}
+	
 
 }
