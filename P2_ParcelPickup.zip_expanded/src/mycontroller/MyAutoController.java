@@ -1,12 +1,19 @@
 package mycontroller;
-import java.util.ArrayList;
+
 import controller.CarController;
+import mycontroller.AStar.Node;
 import world.Car;
+import world.World;
+
 import java.util.HashMap;
 
 import tiles.MapTile;
 import utilities.Coordinate;
 import world.WorldSpatial;
+import java.lang.*;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class MyAutoController extends CarController{		
 		// How many minimum units the wall is away from the player.
@@ -16,6 +23,10 @@ public class MyAutoController extends CarController{
 		
 		// Car Speed to move at
 		private final int CAR_MAX_SPEED = 1;
+		
+		private AStar aStar;
+		private MapRecorder map;
+		
 		
 		//SubjectBase
 		protected ArrayList<ControllerListener> observers;
@@ -37,6 +48,22 @@ public class MyAutoController extends CarController{
 		public MyAutoController(Car car) {
 			super(car);
 			this.observers = new ArrayList<ControllerListener>();
+			map = new MapRecorder(this.getMap());
+			System.out.println(this.getPosition());
+			String[] coordinates = this.getPosition().split(",");
+			String x = coordinates[0];
+			String y = coordinates[1];
+			aStar = new AStar(map.maze, Integer.parseInt(x), Integer.parseInt(y), false);
+			List<Node> path = aStar.findPathTo(5, 1);
+			System.out.println(map.maze.toString());
+			
+			if (path != null) {
+	            path.forEach((n) -> {
+	                System.out.print("[" + n.x + ", " + n.y + "] ");
+	                map.maze[n.y][n.x] = -1;
+	            });
+	            System.out.printf("\nTotal cost: %.02f\n", path.get(path.size() - 1).g);
+			}
 		}
 		
 		
@@ -44,8 +71,9 @@ public class MyAutoController extends CarController{
 		// boolean notSouth = true;
 		@Override
 		public void update() {
-			strategyFactory.getStrategy().action(); // choose the appropriate strategy, needs an input TBD
-			publishPropertyEvent("MyAutoController", "mapping", "some value"); //update the map with recent view
+			//strategyFactory.getStrategy().action(); // choose the appropriate strategy, needs an input TBD
+			//publishPropertyEvent("MyAutoController", "mapping", "some value"); //update the map with recent view
+			//System.out.println(this.getPosition());
 		}
 
 		/**
