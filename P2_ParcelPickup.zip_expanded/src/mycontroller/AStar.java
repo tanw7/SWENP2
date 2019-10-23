@@ -1,63 +1,50 @@
 package mycontroller;
 
-
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
-import utilities.Coordinate;
-import mycontroller.MapRecorder;
  
-public class AStar {
+class AStar {
     private final List<Node> open;
     private final List<Node> closed;
     private final List<Node> path;
-    private final MapRecorder mapRecorder;
+    //private final MapRecorder map;
+    private final int[][] maze;
     private Node now;
     private final int xstart;
     private final int ystart;
-    private int xTarget, yTarget;
+    private int xend, yend;
     private final boolean diag;
  
-
-    public class Node implements Comparable<Node> {
+    // Node class for convienience
+    static class Node implements Comparable {
         public Node parent;
-        public Coordinate coord;
-        public int g;
-        public int h;
-        
-        public Node(Node parent, Coordinate coord, int g, int h) {
+        public int x, y;
+        public double g;
+        public double h;
+        Node(Node parent, int xpos, int ypos, double g, double h) {
             this.parent = parent;
-            this.coord = coord;
+            this.x = xpos;
+            this.y = ypos;
             this.g = g;
             this.h = h;
        }
-        
-        public Node(int x, int y) {
-            this.coord = new Coordinate(x, y);
-        }
-        
        // Compare by f value (g + h)
        @Override
-       public int compareTo(Node o) {
-    	       if (o == null) {
-    		       return -1;
-    	       }
-    	       if (g + h > o.g + o.h) {
-    	    	   	   return 1;
-    	       }
-    	       else if (g + h < o.g + o.h) {
-        	   	   return -1;
-           }
-           return 0;
+       public int compareTo(Object o) {
+           Node that = (Node) o;
+           return (int)((this.g + this.h) - (that.g + that.h));
        }
    }
  
-    public AStar(MapRecorder mapRecorder, Coordinate coord, boolean diag) {
+    AStar(int[][] maze, int xstart, int ystart, boolean diag) {
         this.open = new ArrayList<>();
         this.closed = new ArrayList<>();
         this.path = new ArrayList<>();
-        this.mapRecorder = mapRecorder;
-        this.now = new Node(null, coord, 0, 0);
+        this.maze = maze;
+        this.now = new Node(null, xstart, ystart, 0, 0);
+        this.xstart = xstart;
+        this.ystart = ystart;
         this.diag = diag;
     }
     /*
@@ -67,12 +54,12 @@ public class AStar {
     ** @param (int) yend
     ** @return (List<Node> | null) the path
     */
-    public List<Node> findPathTo(int xTarget, int yTarget) {
-        this.xTarget = xTarget;
-        this.yTarget = yTarget;
+    public List<Node> findPathTo(int xend, int yend) {
+        this.xend = xend;
+        this.yend = yend;
         this.closed.add(this.now);
         addNeigborsToOpenList();
-        while (this.now.coord.x != this.xTarget || this.now.coord.y != this.yTarget) {
+        while (this.now.x != this.xend || this.now.y != this.yend) {
             if (this.open.isEmpty()) { // Nothing to examine
                 return null;
             }
@@ -82,7 +69,7 @@ public class AStar {
             addNeigborsToOpenList();
         }
         this.path.add(0, this.now);
-        while (this.now.coord.x != this.xstart || this.now.coord.y != this.ystart) {
+        while (this.now.x != this.xstart || this.now.y != this.ystart) {
             this.now = this.now.parent;
             this.path.add(0, this.now);
         }
@@ -94,7 +81,7 @@ public class AStar {
     ** @return (bool) NeightborInListFound
     */
     private static boolean findNeighborInList(List<Node> array, Node node) {
-        return array.stream().anyMatch((n) -> (n.coord.x == node.coord.x && n.coord.y == node.coord.y));
+        return array.stream().anyMatch((n) -> (n.x == node.x && n.y == node.y));
     }
     /*
     ** Calulate distance between this.now and xend/yend
@@ -103,9 +90,9 @@ public class AStar {
     */
     private double distance(int dx, int dy) {
         if (this.diag) { // if diagonal movement is alloweed
-            return Math.hypot(this.now.coord.x + dx - this.xTarget, this.now.coord.y + dy - this.yTarget); // return hypothenuse
+            return Math.hypot(this.now.x + dx - this.xend, this.now.y + dy - this.yend); // return hypothenuse
         } else {
-            return Math.abs(this.now.coord.x + dx - this.xTarget) + Math.abs(this.now.coord.y + dy - this.yTarget); // else return "Manhattan distance"
+            return Math.abs(this.now.x + dx - this.xend) + Math.abs(this.now.y + dy - this.yend); // else return "Manhattan distance"
         }
     }
     private void addNeigborsToOpenList() {
@@ -115,16 +102,16 @@ public class AStar {
                 if (!this.diag && x != 0 && y != 0) {
                     continue; // skip if diagonal movement is not allowed
                 }
-                node = new Node(this.now, this.now.coord, this.now.g, (int)this.distance(x, y));
+                node = new Node(this.now, this.now.x + x, this.now.y + y, this.now.g, this.distance(x, y));
                 if ((x != 0 || y != 0) // not this.now
-                    && this.now.coord.x + x >= 0 && this.now.coord.x + x < this.maze[0].length // check maze boundaries
-                    && this.now.coord.y + y >= 0 && this.now.coord.y + y < this.maze.length
-                    && this.mapRecorder[this.now.y + y][this.now.x + x] != -1 // check if square is walkable
+                    && this.now.x + x >= 0 && this.now.x + x < this.maze[0].length // check maze boundaries
+                    && this.now.y + y >= 0 && this.now.y + y < this.maze.length
+                    && this.maze[this.now.y + y][this.now.x + x] != -1 // check if square is walkable
                     && !findNeighborInList(this.open, node) && !findNeighborInList(this.closed, node)) { // if not already done
                         node.g = node.parent.g + 1.; // Horizontal/vertical cost = 1.0
                         node.g += maze[this.now.y + y][this.now.x + x]; // add movement cost for this square
  
-                        // diagonal cost = sqrt(hor_costÂ² + vert_costÂ²)
+                        // diagonal cost = sqrt(hor_cost² + vert_cost²)
                         // in this example the cost would be 12.2 instead of 11
                         /*
                         if (diag && x != 0 && y != 0) {
@@ -137,3 +124,46 @@ public class AStar {
         }
         Collections.sort(this.open);
     }
+    /*
+    public static void main(String[] args) {
+        // -1 = blocked
+        // 0+ = additional movement cost
+        int[][] maze = {
+            {  0,  0,  0,  0,  0,  0,  0,  0},
+            {  0,  0,  0,  0,  0,  0,  0,  0},
+            {  0,  0,  0,100,100,100,  0,  0},
+            {  0,  0,  0,  0,  0,100,  0,  0},
+            {  0,  0,100,  0,  0,100,  0,  0},
+            {  0,  0,100,  0,  0,100,  0,  0},
+            {  0,  0,100,100,100,100,  0,  0},
+            {  0,  0,  0,  0,  0,  0,  0,  0},
+        };
+        AStar as = new AStar(maze, 0, 0, true);
+        List<Node> path = as.findPathTo(7, 7);
+        if (path != null) {
+            path.forEach((n) -> {
+                System.out.print("[" + n.x + ", " + n.y + "] ");
+                maze[n.y][n.x] = -1;
+            });
+            System.out.printf("\nTotal cost: %.02f\n", path.get(path.size() - 1).g);
+ 
+            for (int[] maze_row : maze) {
+                for (int maze_entry : maze_row) {
+                    switch (maze_entry) {
+                        case 0:
+                            System.out.print("_");
+                            break;
+                        case -1:
+                            System.out.print("*");
+                            break;
+                        default:
+                            System.out.print("#");
+                    }
+                }
+                System.out.println();
+            }
+        }
+    }
+    */
+}
+ 
