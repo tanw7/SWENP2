@@ -2,6 +2,8 @@ package mycontroller;
 
 import java.util.HashMap;
 
+import com.sun.javafx.scene.traversal.Direction;
+
 import exceptions.UnsupportedModeException;
 import swen30006.driving.Simulation;
 import tiles.MapTile;
@@ -10,10 +12,9 @@ import world.Car;
 import world.World;
 import world.WorldSpatial;
 
-public class MovementControl {
+public class AdjacentMovementControl {
 	public State state;
 	private int wallSensitivity = 1;
-	private boolean isFollowingWall = false; // This is set to true when the car starts sticking to a wall.
 	
 	
 	public enum State {
@@ -21,7 +22,7 @@ public class MovementControl {
 	}
 	private Car car;
 	
-	public MovementControl(Car car, State state) {
+	public AdjacentMovementControl(Car car, State state) {
 		this.car = car;
 		this.state = State.STOP;
 	}
@@ -29,7 +30,8 @@ public class MovementControl {
 	public void ReverseForward(Car car) {
 		this.car.applyReverseAcceleration();
 		this.car.brake();
-		this.car.applyForwardAcceleration();
+
+		
 	}
 	
 	public void ForwardReverse(Car car) {
@@ -52,13 +54,131 @@ public class MovementControl {
 		this.car.applyReverseAcceleration();
 	}
 	
-	public void MoveToAdjcentLeft(Car car) {
+	public void nextMove (int target_x, int target_y) {
+		float current_x = car.getX();
+		float current_y = car.getY();
+		// car facing north
+		if (car.getOrientation().equals(WorldSpatial.Direction.NORTH)) {
+			//in front of the car
+			if (target_x == current_x && target_y == (current_y+1)){
+				MoveToFront(car);
+			}
+			// right of the car
+			else if(target_x == (current_x+1) && target_y == (current_y)) {
+				MoveToAdjacentRight(car);
+			}
+			// behind of the car
+			else if(target_x == (current_x) && target_y == (current_y-1)) {
+				MoveToBehind(car);
+			}
+			// left of the car
+			else if(target_x == (current_x-1) && target_y == (current_y)) {
+				MoveToAdjacentLeft(car);
+			}
+		}
+		// car facing east
+		else if (car.getOrientation().equals(WorldSpatial.Direction.EAST)) {
+			//in front of the car
+			System.out.println(car.getOrientation());
+			if (target_x == (current_x+1) && target_y == (current_y)){
+				System.out.println("FORWARD");
+				MoveToFront(car);
+			}
+			// right of the car
+			else if(target_x == (current_x) && target_y == (current_y-1)) {
+				System.out.println("RIGHT");
+				MoveToAdjacentRight(car);
+			}
+			// behind of the car
+			else if(target_x == (current_x-1) && target_y == (current_y)) {
+				System.out.println("BEHING");
+				MoveToBehind(car);
+			}
+			// left of the car
+			else if(target_x == (current_x) && target_y == (current_y+1)) {
+				System.out.println("LEFT");
+				MoveToAdjacentLeft(car);
+			}
+		}
+		// car facing south
+		else if (car.getOrientation().equals(WorldSpatial.Direction.SOUTH)) {
+			//in front of the car
+			if (target_x == (current_x) && target_y == (current_y-1)){
+				MoveToFront(car);
+			}
+			// right of the car
+			else if(target_x == (current_x-1) && target_y == (current_y)) {
+				MoveToAdjacentRight(car);
+			}
+			// behind of the car
+			else if(target_x == (current_x) && target_y == (current_y+1)) {
+				MoveToBehind(car);
+			}
+			// left of the car
+			else if(target_x == (current_x+1) && target_y == (current_y)) {
+				MoveToAdjacentLeft(car);
+			}
+		}
+		// car facing west
+		else if (car.getOrientation().equals(WorldSpatial.Direction.WEST)) {
+			//in front of the car
+			if (target_x == (current_x-1) && target_y == (current_y)){
+				MoveToFront(car);
+			}
+			// right of the car
+			else if(target_x == (current_x) && target_y == (current_y+1)) {
+				MoveToAdjacentRight(car);
+			}
+			// behind of the car
+			else if(target_x == (current_x+1) && target_y == (current_y)) {
+				MoveToBehind(car);
+			}
+			// left of the car
+			else if(target_x == (current_x) && target_y == (current_y-1)) {
+				MoveToAdjacentLeft(car);
+			}
+		}
+	}
+	public void MoveToFront(Car car) {
+
+		
+		if (this.state == State.FORWARD) {
+			this.car.applyForwardAcceleration();
+			this.state = State.FORWARD;
+		}
+		else if (this.state == State.STOP) {			
+			this.car.applyForwardAcceleration();
+			this.state = State.FORWARD;
+
+		}
+		
+		
+	}
+	
+	public void MoveToBehind(Car car) {
+
+		
+		if (this.state == State.REVERSE) {
+			this.car.applyReverseAcceleration();
+			this.state = State.REVERSE;
+		}
+		else if (this.state == State.STOP) {			
+			this.car.applyReverseAcceleration();
+			this.state = State.REVERSE;
+
+		}
+		
+		
+	}
+	
+	public void MoveToAdjacentLeft(Car car) {
 		HashMap<Coordinate, MapTile> currentView = this.car.getView();
 		WorldSpatial.Direction orientation =  this.car.getOrientation();
 		
 		if (this.state == State.STOP) {
 			if(this.checkWallAhead(orientation, currentView)) {
 				ReverseForward(car);
+				
 				this.car.turnLeft();
 				this.state = State.FORWARD;
 			} else if(this.checkWallBehind(orientation, currentView)){
@@ -66,13 +186,14 @@ public class MovementControl {
 				this.car.turnLeft();
 				this.state = State.REVERSE;
 			} else {
-				ReverseForward(car);
+				//ReverseForward(car);
+				this.car.applyForwardAcceleration();
 				this.car.turnLeft();
 				this.state = State.FORWARD;
 			}
 	
 		}
-		if (this.state == State.FORWARD) {
+		else if (this.state == State.FORWARD) {
 			if(this.checkWallAhead(orientation, currentView)) {
 				BrakeRF(car);
 				this.car.turnLeft();
@@ -83,7 +204,7 @@ public class MovementControl {
 				this.state = State.FORWARD;
 			}
 		}
-		if(this.state  == State.REVERSE) {
+		else if (this.state  == State.REVERSE) {
 			if(this.checkWallBehind(orientation, currentView)) {
 				BrakeFR(car);
 				this.car.turnLeft();
@@ -97,7 +218,7 @@ public class MovementControl {
 		
 	}
 	
-	public void MoveToAdjcentRight(Car car) {
+	public void MoveToAdjacentRight(Car car) {
 		HashMap<Coordinate, MapTile> currentView = this.car.getView();
 		WorldSpatial.Direction orientation =  this.car.getOrientation();
 		
@@ -117,7 +238,7 @@ public class MovementControl {
 			}
 	
 		}
-		if (this.state == State.FORWARD) {
+		else if (this.state == State.FORWARD) {
 			if(this.checkWallAhead(orientation, currentView)) {
 				BrakeRF(car);
 				this.car.turnRight();
@@ -128,7 +249,7 @@ public class MovementControl {
 				this.state = State.FORWARD;
 			}
 		}
-		if(this.state  == State.REVERSE) {
+		else if(this.state  == State.REVERSE) {
 			if(this.checkWallBehind(orientation, currentView)) {
 				BrakeFR(car);
 				this.car.turnRight();
