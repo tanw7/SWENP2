@@ -1,7 +1,10 @@
 package mycontroller;
 
 import controller.CarController;
+import java.util.LinkedList; 
+import java.util.Queue; 
 import mycontroller.AStar.Node;
+import mycontroller.FloodFill.Direction;
 import world.Car;
 import world.World;
 
@@ -31,6 +34,11 @@ public class MyAutoController extends CarController{
 		private AStar aStar;
 		private MapRecorder map;
 		private AdjacentMovementControl movementControl;
+		private Queue<Move> queue;
+		
+		public enum Move {
+			ACCELERATE, REVERSE, BRAKE, LEFT, RIGHT
+		}
 		
 		
 		//SubjectBase
@@ -55,6 +63,8 @@ public class MyAutoController extends CarController{
 			this.observers = new ArrayList<ControllerListener>();
 			this.movementControl = new AdjacentMovementControl(car, AdjacentMovementControl.State.STOP);
 			map = new MapRecorder(this.getMap());
+			this.queue = new LinkedList<>();
+			test();
 			System.out.println(this.getPosition());
 			String[] coordinates = this.getPosition().split(",");
 			String x = coordinates[0];
@@ -82,11 +92,35 @@ public class MyAutoController extends CarController{
 			//strategyFactory.getStrategy().action(); // choose the appropriate strategy, needs an input TBD
 			//publishPropertyEvent("MyAutoController", "mapping", "some value"); //update the map with recent view
 			//System.out.println(this.getPosition());
+//
+//			System.out.printf("BEGIN");
+//			System.out.println("NEXT MOVE:" + "[" + this.path.get(0).x + ", " + this.path.get(0).y + "] ");
+//			movementControl.nextMove(this.path.get(0).x,this.path.get(0).y);
+//			this.path.remove(0);
+//			leftMove();
+		System.out.println(queue.peek());
+		if(queue.peek().equals(Move.ACCELERATE)) {
+			applyForwardAcceleration();
+			queue.remove();
+		}
+		else if(queue.peek().equals(Move.REVERSE)) {
+			applyReverseAcceleration();
+			queue.remove();
+		}
+		else if(queue.peek().equals(Move.BRAKE)) {
+			applyBrake();
+			queue.remove();
+		}
+		else if(queue.peek().equals(Move.RIGHT)) {
+			turnRight();
+			queue.remove();
+		}
+		else if(queue.peek().equals(Move.LEFT)) {
+			System.out.println("Should turn left");
+			turnLeft();
+			queue.remove();
+		}
 			
-			System.out.printf("BEGIN");
-			System.out.println("NEXT MOVE:" + "[" + this.path.get(0).x + ", " + this.path.get(0).y + "] ");
-			movementControl.nextMove(this.path.get(0).x,this.path.get(0).y);
-			this.path.remove(0);
 		}
 
 		/**
@@ -188,4 +222,31 @@ public class MyAutoController extends CarController{
 			return false;
 		}
 		
+		public Queue<Move> queueGet() {
+			return queue;
+			
+		}
+		public void queueAdd(Move move) {
+			queue.add(move);
+			
+		}
+		
+		public void test() {
+			queue.add(Move.ACCELERATE);
+			queue.add(Move.LEFT);
+			queue.add(Move.ACCELERATE);
+			queue.add(Move.ACCELERATE);
+			queue.add(Move.ACCELERATE);
+			queue.add(Move.ACCELERATE);
+			queue.add(Move.LEFT);
+			queue.add(Move.ACCELERATE);
+			queue.add(Move.ACCELERATE);
+			queue.add(Move.ACCELERATE);
+			queue.add(Move.ACCELERATE);
+			queue.add(Move.ACCELERATE);
+			queue.add(Move.ACCELERATE);
+			queue.add(Move.ACCELERATE);
+		}
+		
 	}
+

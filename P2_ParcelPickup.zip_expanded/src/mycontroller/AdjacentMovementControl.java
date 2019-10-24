@@ -30,8 +30,7 @@ public class AdjacentMovementControl {
 	public void ReverseForward(Car car) {
 		this.car.applyReverseAcceleration();
 		this.car.brake();
-
-		
+		this.car.applyForwardAcceleration();
 	}
 	
 	public void ForwardReverse(Car car) {
@@ -57,6 +56,7 @@ public class AdjacentMovementControl {
 	public void nextMove (int target_x, int target_y) {
 		float current_x = car.getX();
 		float current_y = car.getY();
+		
 		// car facing north
 		if (car.getOrientation().equals(WorldSpatial.Direction.NORTH)) {
 			//in front of the car
@@ -91,13 +91,14 @@ public class AdjacentMovementControl {
 			}
 			// behind of the car
 			else if(target_x == (current_x-1) && target_y == (current_y)) {
-				System.out.println("BEHING");
+				System.out.println("BEHIND");
 				MoveToBehind(car);
 			}
 			// left of the car
 			else if(target_x == (current_x) && target_y == (current_y+1)) {
-				System.out.println("LEFT");
 				MoveToAdjacentLeft(car);
+				
+	
 			}
 		}
 		// car facing south
@@ -178,7 +179,6 @@ public class AdjacentMovementControl {
 		if (this.state == State.STOP) {
 			if(this.checkWallAhead(orientation, currentView)) {
 				ReverseForward(car);
-				
 				this.car.turnLeft();
 				this.state = State.FORWARD;
 			} else if(this.checkWallBehind(orientation, currentView)){
@@ -186,8 +186,7 @@ public class AdjacentMovementControl {
 				this.car.turnLeft();
 				this.state = State.REVERSE;
 			} else {
-				//ReverseForward(car);
-				this.car.applyForwardAcceleration();
+				ReverseForward(car);
 				this.car.turnLeft();
 				this.state = State.FORWARD;
 			}
