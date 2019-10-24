@@ -46,7 +46,7 @@ public class MapRecorder {
 
 		for (int i = 0; i < MAP_WIDTH; i++) {
 			for (int j = 0; j<MAP_HEIGHT; j++) {
-				System.out.println(i+","+j);
+				//System.out.println(i+","+j);
 				if(tileType[i][j] == null && !map[i][j].isType(MapTile.Type.WALL)) {
 					tileType[i][j] = TileType.UNSEARCHED;
 					addToList(i, j, list);
@@ -94,14 +94,12 @@ public class MapRecorder {
 		}
 	}
 
-	public ArrayList<Coordinate> addToList(int x, int y, ArrayList<Coordinate> list) {
+	public void addToList(int x, int y, ArrayList<Coordinate> list) {
 		list.add(new Coordinate(x, y));
-		return list;
 	}
 
-	public ArrayList<Coordinate> DeleteFromList(int x, int y, ArrayList<Coordinate> list) {
+	public void DeleteFromList(int x, int y, ArrayList<Coordinate> list) {
 		list.remove(new Coordinate(x,y));
-		return list;
 	}
 
 	public static Coordinate randomItem(ArrayList<Coordinate> mylist) {

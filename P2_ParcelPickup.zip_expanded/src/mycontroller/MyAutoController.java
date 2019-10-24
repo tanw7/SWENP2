@@ -41,6 +41,7 @@ public class MyAutoController extends CarController{
 		private AdjacentMovementControl movementControl;
 		private Queue<Move> queue;
 		private String[] currentCoordinate;
+		private ArrayList<Coordinate> randomCoordinates = new ArrayList<Coordinate>();
 		
 
 		public enum Move {
@@ -71,6 +72,12 @@ public class MyAutoController extends CarController{
 			this.movementControl = new AdjacentMovementControl(car, AdjacentMovementControl.State.STOP);
 			map = new MapRecorder(this.getMap());
 			map.CarView(getView());
+			path = new ArrayList<Node>();
+			randomCoordinates.add(new Coordinate(1,18));
+			//randomCoordinates.add(new Coordinate(10,4));
+			randomCoordinates.add(new Coordinate(8,10));
+			randomCoordinates.add(new Coordinate(10,3));
+			randomCoordinates.add(new Coordinate(15,4));
 			//this.queue = new LinkedList<>();
 		}
 		
@@ -109,7 +116,7 @@ public class MyAutoController extends CarController{
         
         private int getCurrentY() {
         	currentCoordinate = this.getPosition().split(",");
-			String y = currentCoordinate[0];
+			String y = currentCoordinate[1];
 			return Integer.parseInt(y);
         }
         
@@ -144,12 +151,17 @@ public class MyAutoController extends CarController{
                }
             }
 			*/
-        	if (astarQueue.isEmpty()) {
+        	if (astarQueue.isEmpty() && movementQueue.isEmpty()) {
         		System.out.println("A* queue is empty, proceed to get random location.");
         		aStar = new AStar(map.maze, getCurrentX(), getCurrentY(), false);
+        		System.out.println("Current location:" + getCurrentX() + "," + getCurrentY());
         		Coordinate randomTile = map.randomItem(map.list);
-        		System.out.println("Moving randomly to:" + randomTile.x +","+ randomTile.y);
-        		this.path = aStar.findPathTo(randomTile.x, randomTile.y);
+        		//System.out.println("Moving randomly to:" + randomTile.x +","+ randomTile.y);
+        		
+        		Coordinate randomCoordinate = randomCoordinates.remove(0);
+        		System.out.println("Setting path to: " + randomCoordinate.x + "," + randomCoordinate.y);
+        		path = new ArrayList<Node>();
+        		this.path = aStar.findPathTo(randomCoordinate.x, randomCoordinate.y);
         		if (map.map[randomTile.x][randomTile.y].getType().equals(MapTile.Type.WALL)) {
         			System.out.println("WARNING TILE IS WALL");
         		}else {
@@ -179,13 +191,19 @@ public class MyAutoController extends CarController{
         		nextTile = removeAstar(astarQueue);
         		System.out.println("Go to tile:" + nextTile.x + "," + nextTile.y);
         		movementList = movementControl.nextMove(nextTile.x, nextTile.y);
+        		if (astarQueue.isEmpty()) { // last one
+        			movementControl.Brake(movementList);
+        		}
         		
         		for (int i = 0; i < movementList.size(); i++) {
             		addQueue(movementQueue, movementList.get(i));
             	}
         	}
         	
+        	
         	nextStep = removeQueue(movementQueue);
+        	
+        	
         	
         	
         	System.out.println("----------");
@@ -210,6 +228,10 @@ public class MyAutoController extends CarController{
 		          System.out.println("RIGHT");
 		          turnRight();
 		          break;
+	            case SKIP:
+	              	
+	              break;	
+	            	
             }
         	map.CarView(getView());
         	

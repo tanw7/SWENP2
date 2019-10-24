@@ -77,7 +77,7 @@ class AStar {
             this.now = this.now.parent;
             this.path.add(0, this.now);
         }
-        System.out.println("crashes here maybe?");
+        //System.out.println("crashes here maybe?");
         return this.path;
     }
     /*
