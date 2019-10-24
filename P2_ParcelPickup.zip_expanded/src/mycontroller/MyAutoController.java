@@ -41,7 +41,7 @@ public class MyAutoController extends CarController{
 		private Queue<Move> queue;
 		
 		public enum Move {
-			ACCELERATE, REVERSE, BRAKE, LEFT, RIGHT
+			ACCELERATE, REVERSE, BRAKE, LEFT, RIGHT, SKIP
 		}
 		
 		
@@ -67,8 +67,8 @@ public class MyAutoController extends CarController{
 			this.observers = new ArrayList<ControllerListener>();
 			this.movementControl = new AdjacentMovementControl(car, AdjacentMovementControl.State.STOP);
 			map = new MapRecorder(this.getMap());
-			this.queue = new LinkedList<>();
-			test();
+			//this.queue = new LinkedList<>();
+			
 			System.out.println(this.getPosition());
 			String[] coordinates = this.getPosition().split(",");
 			String x = coordinates[0];
@@ -80,22 +80,22 @@ public class MyAutoController extends CarController{
 			this.path.remove(0);
 			if (this.path != null) {
 				 this.path.forEach((n) -> {
-					 movementControl.nextMove(n.x, n.y);
+					 //movementControl.nextMove(n.x, n.y);
 	                 System.out.print("[" + n.x + ", " + n.y + "] ");
 	                 map.maze[n.y][n.x] = -1;
 		            });
 		            System.out.printf("\nTotal cost: %.02f\n", path.get(path.size() - 1).g);
 			}
 		}
-		private ArrayList<String> movementQueue = new ArrayList<String>();
+		private ArrayList<Move> movementQueue = new ArrayList<Move>();
 
-        public void addQueue(String movement) {
+        public void addQueue(Move movement) {
             movementQueue.add(movement);
         }
 
-        public String removeQueue() {
+        public Move removeQueue() {
             if (movementQueue.isEmpty()) {
-                return "Skip";
+                return Move.SKIP;
             }
             return movementQueue.remove(0);
         }
@@ -104,6 +104,7 @@ public class MyAutoController extends CarController{
         // boolean notSouth = true;
         @Override
         public void update() {
+        	/* For Manual Control
             Set<Integer> parcels = Simulation.getParcels();
             Simulation.resetParcels();
             for (int k : parcels){
@@ -126,7 +127,8 @@ public class MyAutoController extends CarController{
                     default:
                }
             }
-
+			*/
+        	
             System.out.println(removeQueue());
             //strategyFactory.getStrategy().action(); // choose the appropriate strategy, needs an input TBD
             //publishPropertyEvent("MyAutoController", "mapping", "some value"); //update the map with recent view
@@ -135,7 +137,6 @@ public class MyAutoController extends CarController{
 		
 		// Coordinate initialGuess;
 		// boolean notSouth = true;
-		@Override
 //		public void update() {
 //			//strategyFactory.getStrategy().action(); // choose the appropriate strategy, needs an input TBD
 //			//publishPropertyEvent("MyAutoController", "mapping", "some value"); //update the map with recent view
@@ -269,7 +270,7 @@ public class MyAutoController extends CarController{
 			}
 			return false;
 		}
-		
+		/*
 		public Queue<Move> queueGet() {
 			return queue;
 			
@@ -295,7 +296,7 @@ public class MyAutoController extends CarController{
 			queue.add(Move.ACCELERATE);
 			queue.add(Move.ACCELERATE);
 		}
-		
+		*/
 		
 	}
 
