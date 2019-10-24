@@ -73,11 +73,11 @@ public class MyAutoController extends CarController{
 			map = new MapRecorder(this.getMap());
 			map.CarView(getView());
 			this.path2 = new ArrayList<Node>();
-			randomCoordinates.add(new Coordinate(18,18));
+			randomCoordinates.add(new Coordinate(5,6));
 			//randomCoordinates.add(new Coordinate(10,4));
 			randomCoordinates.add(new Coordinate(9,10));
-			randomCoordinates.add(new Coordinate(13,3));
-			randomCoordinates.add(new Coordinate(20,4));
+			randomCoordinates.add(new Coordinate(6,3));
+			randomCoordinates.add(new Coordinate(5,4));
 			//this.queue = new LinkedList<>();
 		}
 		
@@ -155,7 +155,7 @@ public class MyAutoController extends CarController{
         		System.out.println("A* queue is empty, proceed to get random location.");
         		aStar = new AStar(map.maze, getCurrentX(), getCurrentY(), false);
         		System.out.println("Current location:" + getCurrentX() + "," + getCurrentY());
-        		Coordinate randomTile = map.randomItem(map.list);
+        		Coordinate randomTile = map.randomItem(randomCoordinates);
         		//System.out.println("Moving randomly to:" + randomTile.x +","+ randomTile.y);
         		
         		Coordinate randomCoordinate = randomCoordinates.remove(0);

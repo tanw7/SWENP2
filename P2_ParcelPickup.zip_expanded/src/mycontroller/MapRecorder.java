@@ -148,6 +148,7 @@ public class MapRecorder {
 
 	public static Coordinate randomItem(ArrayList<Coordinate> mylist) {
 	    Random rand = new Random();
+	    System.out.print("myLISTSIZE= " + mylist.size());
 	    Coordinate randomCoord = mylist.get(rand.nextInt(mylist.size()));
 	    return randomCoord;
 	}

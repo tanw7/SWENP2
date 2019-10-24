@@ -420,4 +420,9 @@ public class AdjacentMovementControl {
 		return false;
 	}
 
+	public void Brake(ArrayList<Move> movementList) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
