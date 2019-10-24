@@ -106,12 +106,12 @@ class AStar {
                 if ((x != 0 || y != 0) // not this.now
                     && this.now.x + x >= 0 && this.now.x + x < this.maze[0].length // check maze boundaries
                     && this.now.y + y >= 0 && this.now.y + y < this.maze.length
-                    && this.maze[this.now.y + y][this.now.x + x] != -1 // check if square is walkable
+                    && this.maze[this.now.x + x][this.now.y + y] != -1 // check if square is walkable
                     && !findNeighborInList(this.open, node) && !findNeighborInList(this.closed, node)) { // if not already done
                         node.g = node.parent.g + 1.; // Horizontal/vertical cost = 1.0
-                        node.g += maze[this.now.y + y][this.now.x + x]; // add movement cost for this square
- 
-                        // diagonal cost = sqrt(hor_cost² + vert_cost²)
+                        node.g += maze[this.now.x + x][this.now.y + y]; // add movement cost for this square
+                        //System.out.println(this.maze[4][4]);
+                        // diagonal cost = sqrt(hor_costï¿½ + vert_costï¿½)
                         // in this example the cost would be 12.2 instead of 11
                         /*
                         if (diag && x != 0 && y != 0) {
