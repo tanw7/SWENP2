@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class MapRecorder {
 	
 	public enum TileType {
-		SEARCHED, UNSEARCHED, PARCEL
+		SEARCHED, UNSEARCHED, PARCEL, UNREACHABLE, WALL
 	}
 	
 	public int[][] maze;
@@ -39,11 +39,14 @@ public class MapRecorder {
 			int j = entry.getKey().y;
 			//System.out.print("("+String.format("%4s", entry.getKey())+")");
 			map[i][j] = entry.getValue();
+			if(map[i][j].isType(MapTile.Type.WALL)) {
+				tileType[i][j] = TileType.WALL;
+			}
 		}
 		
 		for (int i = 0; i < MAP_WIDTH; i++) {
 			for (int j = 0; j<MAP_HEIGHT; j++) {
-				if(tileType[i][j] == null ) {
+				if(tileType[i][j] == null && !map[i][j].isType(MapTile.Type.WALL)) {
 					tileType[i][j] = TileType.UNSEARCHED;
 					addToList(i, j, list);
 				}
@@ -55,7 +58,7 @@ public class MapRecorder {
 			for (int i = 0; i< MAP_WIDTH; i++) {
 				//System.out.print(map[i][j].getType());
 				if(map[i][j].isType(MapTile.Type.WALL)) {
-					maze[i][j] = 100;
+					maze[i][j] = -1;
 					//System.out.print(MAP_HEIGHT);
 					//System.out.print(map[5][3].getType());
 				} else {
@@ -109,7 +112,7 @@ public class MapRecorder {
 	
 	
 	public boolean TileOutOfRange(int x, int y) {
-		return (x<0 || x > MAP_WIDTH || y <0 || y > MAP_HEIGHT);
+		return (x<0 || x >= MAP_WIDTH - 1 || y <0 || y >= MAP_HEIGHT - 1);
 	}
 
 
