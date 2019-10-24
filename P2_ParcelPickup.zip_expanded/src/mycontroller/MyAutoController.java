@@ -55,7 +55,7 @@ public class MyAutoController extends CarController{
 			String y = coordinates[1];
 			aStar = new AStar(map.maze, Integer.parseInt(x), Integer.parseInt(y), false);
 			List<Node> path = aStar.findPathTo(5, 1);
-			System.out.println(map.maze.toString());
+			
 			
 			if (path != null) {
 	            path.forEach((n) -> {
