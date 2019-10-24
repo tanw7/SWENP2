@@ -88,7 +88,7 @@ public class AdjacentMovementControl {
 		// car facing east
 		else if (car.getOrientation().equals(WorldSpatial.Direction.EAST)) {
 			//in front of the car
-			System.out.println(car.getOrientation());
+			//System.out.println(car.getOrientation());
 			if (target_x == (current_x+1) && target_y == (current_y)){
 
 				MoveToFront(car , movementList);
@@ -212,12 +212,10 @@ public class AdjacentMovementControl {
 		}
 		else if (this.state == State.FORWARD) {
 			if(this.checkWallAhead(orientation, currentView)) {
-				BrakeRF(car, movementList);
 				movementList.add(Move.LEFT);
 				this.state = State.FORWARD;
 				return movementList;
 			} else {
-				BrakeRF(car, movementList);
 				movementList.add(Move.LEFT);
 				this.state = State.FORWARD;
 				return movementList;

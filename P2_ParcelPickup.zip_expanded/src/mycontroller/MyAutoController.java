@@ -76,15 +76,16 @@ public class MyAutoController extends CarController{
 			String y = coordinates[1];
 			aStar = new AStar(map.maze, Integer.parseInt(x), Integer.parseInt(y), false);
 			this.path = aStar.findPathTo(10, 15);
-			System.out.println(map.maze.toString());
-			System.out.println("Starting Point=" + car.getX() + car.getY());
+			//System.out.println(map.maze.toString());
+			//System.out.println("Starting Point=" + car.getX() + car.getY());
 			this.path.remove(0);
 			if (this.path != null) {
 				 this.path.forEach((n) -> {
-					 ArrayList<Move> movementList = movementControl.nextMove(n.x, n.y);
+					 //ArrayList<Move> movementList = movementControl.nextMove(n.x, n.y);
 					 //movementList.forEach((m)->{
 					 //	 System.out.println("MOVEMENT "+m);
 					 //});
+					 addQueue(astarQueue, new Coordinate(n.x, n.y));
 	                 System.out.print("[" + n.x + ", " + n.y + "] ");
 	                 map.maze[n.y][n.x] = -1;
 		            });
@@ -92,18 +93,30 @@ public class MyAutoController extends CarController{
 			}
 		}
 		private ArrayList<Move> movementQueue = new ArrayList<Move>();
-
-        public void addQueue(Move movement) {
-            movementQueue.add(movement);
+		private ArrayList<Coordinate> astarQueue = new ArrayList<Coordinate>();
+		
+        public void addQueue(ArrayList<Move> queue, Move movement) {
+            queue.add(movement);
+        }
+        
+        public void addQueue(ArrayList<Coordinate> queue, Coordinate movement) {
+            queue.add(movement);
         }
 
-        public Move removeQueue() {
-            if (movementQueue.isEmpty()) {
+        public Move removeQueue(ArrayList<Move> queue) {
+            if (queue.isEmpty()) {
                 return Move.SKIP;
             }
-            return movementQueue.remove(0);
+            return queue.remove(0);
         }
-
+        
+        public Coordinate removeAstar(ArrayList<Coordinate> queue) {
+        	return queue.remove(0);
+        }
+        
+        ArrayList<Move> movementList;
+        Move nextStep;
+        Coordinate nextTile;
         // Coordinate initialGuess;
         // boolean notSouth = true;
         @Override
@@ -132,9 +145,42 @@ public class MyAutoController extends CarController{
                }
             }
 			*/
-        	System.out.println("------------------");
-        	System.out.println(movementControl.nextMove(4,5));
-        	System.out.println("------------------");
+        	//System.out.println(astarQueue);
+        	if (movementQueue.isEmpty()) {
+        		nextTile = removeAstar(astarQueue);
+        		System.out.println("Go to tile:" + nextTile.x + "," + nextTile.y);
+        		movementList = movementControl.nextMove(nextTile.x, nextTile.y);
+        		for (int i = 0; i < movementList.size(); i++) {
+            		addQueue(movementQueue, movementList.get(i));
+            	}
+        	}
+        	
+        	nextStep = removeQueue(movementQueue);
+        	System.out.println("----------");
+        	switch(nextStep) {
+	            case ACCELERATE:
+	              System.out.println("ACCELERATE");
+	              applyForwardAcceleration();
+	              break;
+	            case REVERSE:
+	               System.out.println("REVERSE");
+	               applyReverseAcceleration();
+	              break;
+	            case BRAKE:
+	              System.out.println("BRAKE");
+	              applyBrake();
+	              break;
+	            case LEFT:
+		          System.out.println("LEFT");
+		          turnLeft();
+		          break;
+	            case RIGHT:
+		          System.out.println("RIGHT");
+		          turnRight();
+		          break;
+            }
+        	//System.out.println(movementControl.nextMove(2,4));
+
 
         	
             //System.out.println(removeQueue());
