@@ -1,10 +1,13 @@
 package mycontroller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Queue;
 
 import com.sun.javafx.scene.traversal.Direction;
 
 import exceptions.UnsupportedModeException;
+import mycontroller.MyAutoController.Move;
 import swen30006.driving.Simulation;
 import tiles.MapTile;
 import utilities.Coordinate;
@@ -27,53 +30,59 @@ public class AdjacentMovementControl {
 		this.state = State.STOP;
 	}
 	
-	public void ReverseForward(Car car) {
-		this.car.applyReverseAcceleration();
-		this.car.brake();
-		this.car.applyForwardAcceleration();
+	public void ReverseForward(Car car, ArrayList<Move> movementList) {
+		movementList.add(Move.REVERSE);
+		movementList.add(Move.BRAKE);
+		movementList.add(Move.ACCELERATE);
 	}
 	
-	public void ForwardReverse(Car car) {
-		this.car.applyForwardAcceleration();
-		this.car.brake();
-		this.car.applyReverseAcceleration();
+	public void ForwardReverse(Car car,ArrayList<Move> movementList) {
+		movementList.add(Move.ACCELERATE);
+		movementList.add(Move.BRAKE);
+		movementList.add(Move.REVERSE);
 	}
 
-	public void BrakeRF(Car car) {
-		this.car.brake();
-		this.car.applyReverseAcceleration();
-		this.car.brake();
-		this.car.applyForwardAcceleration();
+	public void BrakeRF(Car car,ArrayList<Move> movementList) {
+		movementList.add(Move.BRAKE);
+		movementList.add(Move.REVERSE);
+		movementList.add(Move.BRAKE);
+		movementList.add(Move.ACCELERATE);
+
 	}
 	
-	public void BrakeFR(Car car) {
-		this.car.brake();
-		this.car.applyForwardAcceleration();
-		this.car.brake();
-		this.car.applyReverseAcceleration();
+	public void BrakeFR(Car car,ArrayList<Move> movementList) {
+		movementList.add(Move.BRAKE);
+		movementList.add(Move.ACCELERATE);
+		movementList.add(Move.BRAKE);
+		movementList.add(Move.REVERSE);
+
 	}
 	
-	public void nextMove (int target_x, int target_y) {
+	public  ArrayList<Move>  nextMove (int target_x, int target_y) {
+		ArrayList<Move> movementList = new  ArrayList<Move> ();
 		float current_x = car.getX();
 		float current_y = car.getY();
+		
 		
 		// car facing north
 		if (car.getOrientation().equals(WorldSpatial.Direction.NORTH)) {
 			//in front of the car
 			if (target_x == current_x && target_y == (current_y+1)){
-				MoveToFront(car);
+				MoveToFront(car , movementList);
+				return movementList;
 			}
 			// right of the car
 			else if(target_x == (current_x+1) && target_y == (current_y)) {
-				MoveToAdjacentRight(car);
+				MoveToAdjacentRight(car,movementList);
 			}
 			// behind of the car
 			else if(target_x == (current_x) && target_y == (current_y-1)) {
-				MoveToBehind(car);
+				movementList.add(Move.REVERSE);
+				return movementList;
 			}
 			// left of the car
 			else if(target_x == (current_x-1) && target_y == (current_y)) {
-				MoveToAdjacentLeft(car);
+				MoveToAdjacentLeft(car, movementList);
 			}
 		}
 		// car facing east
@@ -81,22 +90,22 @@ public class AdjacentMovementControl {
 			//in front of the car
 			System.out.println(car.getOrientation());
 			if (target_x == (current_x+1) && target_y == (current_y)){
-				System.out.println("FORWARD");
-				MoveToFront(car);
+
+				MoveToFront(car , movementList);
 			}
 			// right of the car
 			else if(target_x == (current_x) && target_y == (current_y-1)) {
 				System.out.println("RIGHT");
-				MoveToAdjacentRight(car);
+				MoveToAdjacentRight(car,movementList);
 			}
 			// behind of the car
 			else if(target_x == (current_x-1) && target_y == (current_y)) {
 				System.out.println("BEHIND");
-				MoveToBehind(car);
+				MoveToBehind(car, movementList);
 			}
 			// left of the car
 			else if(target_x == (current_x) && target_y == (current_y+1)) {
-				MoveToAdjacentLeft(car);
+				MoveToAdjacentLeft(car, movementList);
 				
 	
 			}
@@ -105,160 +114,181 @@ public class AdjacentMovementControl {
 		else if (car.getOrientation().equals(WorldSpatial.Direction.SOUTH)) {
 			//in front of the car
 			if (target_x == (current_x) && target_y == (current_y-1)){
-				MoveToFront(car);
+				MoveToFront(car , movementList);
 			}
 			// right of the car
 			else if(target_x == (current_x-1) && target_y == (current_y)) {
-				MoveToAdjacentRight(car);
+				MoveToAdjacentRight(car,movementList);
 			}
 			// behind of the car
 			else if(target_x == (current_x) && target_y == (current_y+1)) {
-				MoveToBehind(car);
+				MoveToBehind(car, movementList);
 			}
 			// left of the car
 			else if(target_x == (current_x+1) && target_y == (current_y)) {
-				MoveToAdjacentLeft(car);
+				MoveToAdjacentLeft(car, movementList);
 			}
 		}
 		// car facing west
 		else if (car.getOrientation().equals(WorldSpatial.Direction.WEST)) {
 			//in front of the car
 			if (target_x == (current_x-1) && target_y == (current_y)){
-				MoveToFront(car);
+				MoveToFront(car , movementList);
 			}
 			// right of the car
 			else if(target_x == (current_x) && target_y == (current_y+1)) {
-				MoveToAdjacentRight(car);
+				MoveToAdjacentRight(car,movementList);
 			}
 			// behind of the car
 			else if(target_x == (current_x+1) && target_y == (current_y)) {
-				MoveToBehind(car);
+				MoveToBehind(car, movementList);
 			}
 			// left of the car
 			else if(target_x == (current_x) && target_y == (current_y-1)) {
-				MoveToAdjacentLeft(car);
+				MoveToAdjacentLeft(car, movementList);
 			}
 		}
+		return movementList;
 	}
-	public void MoveToFront(Car car) {
+	public ArrayList<Move>  MoveToFront(Car car,ArrayList<Move> movementList) {
 
 		
 		if (this.state == State.FORWARD) {
-			this.car.applyForwardAcceleration();
+			movementList.add(Move.ACCELERATE);
 			this.state = State.FORWARD;
+			return movementList;
 		}
 		else if (this.state == State.STOP) {			
-			this.car.applyForwardAcceleration();
+			movementList.add(Move.ACCELERATE);
 			this.state = State.FORWARD;
+			return movementList;
 
 		}
+		return movementList;
 		
 		
 	}
 	
-	public void MoveToBehind(Car car) {
+	public  ArrayList<Move> MoveToBehind(Car car,ArrayList<Move> movementList) {
 
 		
 		if (this.state == State.REVERSE) {
-			this.car.applyReverseAcceleration();
+			movementList.add(Move.REVERSE);
 			this.state = State.REVERSE;
+			return movementList;
 		}
 		else if (this.state == State.STOP) {			
-			this.car.applyReverseAcceleration();
+			movementList.add(Move.REVERSE);
 			this.state = State.REVERSE;
-
+			return movementList;
 		}
+		return movementList;
 		
 		
 	}
 	
-	public void MoveToAdjacentLeft(Car car) {
+	public ArrayList<Move> MoveToAdjacentLeft(Car car,ArrayList<Move> movementList) {
 		HashMap<Coordinate, MapTile> currentView = this.car.getView();
 		WorldSpatial.Direction orientation =  this.car.getOrientation();
 		
 		if (this.state == State.STOP) {
 			if(this.checkWallAhead(orientation, currentView)) {
-				ReverseForward(car);
-				this.car.turnLeft();
+				ReverseForward(car, movementList);
+				movementList.add(Move.LEFT);
 				this.state = State.FORWARD;
+				return movementList;
 			} else if(this.checkWallBehind(orientation, currentView)){
-				ForwardReverse(car);
-				this.car.turnLeft();
+				ForwardReverse(car, movementList);
+				movementList.add(Move.LEFT);
 				this.state = State.REVERSE;
+				return movementList;
 			} else {
-				ReverseForward(car);
-				this.car.turnLeft();
+				ReverseForward(car, movementList);
+				movementList.add(Move.LEFT);
 				this.state = State.FORWARD;
+				return movementList;
 			}
 	
 		}
 		else if (this.state == State.FORWARD) {
 			if(this.checkWallAhead(orientation, currentView)) {
-				BrakeRF(car);
-				this.car.turnLeft();
+				BrakeRF(car, movementList);
+				movementList.add(Move.LEFT);
 				this.state = State.FORWARD;
+				return movementList;
 			} else {
-				BrakeRF(car);
-				this.car.turnLeft();
+				BrakeRF(car, movementList);
+				movementList.add(Move.LEFT);
 				this.state = State.FORWARD;
+				return movementList;
 			}
 		}
 		else if (this.state  == State.REVERSE) {
 			if(this.checkWallBehind(orientation, currentView)) {
-				BrakeFR(car);
-				this.car.turnLeft();
+				BrakeFR(car, movementList);
+				movementList.add(Move.LEFT);
 				this.state = State.REVERSE;
+				return movementList;
 			} else {
-				BrakeFR(car);
-				this.car.turnLeft();
+				BrakeFR(car, movementList);
+				movementList.add(Move.LEFT);
 				this.state = State.REVERSE;
+				return movementList;
 			}
 		}
+		return movementList;
 		
 	}
 	
-	public void MoveToAdjacentRight(Car car) {
+	public ArrayList<Move> MoveToAdjacentRight(Car car,ArrayList<Move> movementList) {
 		HashMap<Coordinate, MapTile> currentView = this.car.getView();
 		WorldSpatial.Direction orientation =  this.car.getOrientation();
-		
 		if (this.state == State.STOP) {
 			if(this.checkWallAhead(orientation, currentView)) {
-				ReverseForward(car);
-				this.car.turnRight();
+				ReverseForward(car, movementList);
+				movementList.add(Move.RIGHT);
 				this.state = State.FORWARD;
+				return movementList;
 			} else if(this.checkWallBehind(orientation, currentView)){
-				ForwardReverse(car);
-				this.car.turnRight();
+				ForwardReverse(car, movementList);
+				movementList.add(Move.RIGHT);
 				this.state = State.REVERSE;
+				return movementList;
 			} else {
-				ReverseForward(car);
-				this.car.turnRight();
+				ReverseForward(car, movementList);
+				movementList.add(Move.RIGHT);;
 				this.state = State.FORWARD;
+				return movementList;
 			}
 	
 		}
 		else if (this.state == State.FORWARD) {
 			if(this.checkWallAhead(orientation, currentView)) {
-				BrakeRF(car);
-				this.car.turnRight();
+				BrakeRF(car, movementList);
+				movementList.add(Move.RIGHT);
 				this.state = State.FORWARD;
+				return movementList;
 			} else {
-				BrakeRF(car);
-				this.car.turnRight();
+				BrakeRF(car, movementList);
+				movementList.add(Move.RIGHT);
 				this.state = State.FORWARD;
+				return movementList;
 			}
 		}
 		else if(this.state  == State.REVERSE) {
 			if(this.checkWallBehind(orientation, currentView)) {
-				BrakeFR(car);
-				this.car.turnRight();
+				BrakeFR(car, movementList);
+				movementList.add(Move.RIGHT);;
 				this.state = State.REVERSE;
+				return movementList;
 			} else {
-				BrakeFR(car);
-				this.car.turnRight();
+				BrakeFR(car, movementList);
+				movementList.add(Move.RIGHT);
 				this.state = State.REVERSE;
+				return movementList;
 			}
 		}
+		return movementList;
 		
 	}
 	
