@@ -30,11 +30,6 @@ public class AdjacentMovementControl {
 		this.state = State.STOP;
 	}
 	
-	public void Brake(ArrayList<Move> movementList) {
-		movementList.add(Move.BRAKE);
-		this.state = State.STOP;
-	}
-	
 	public void ReverseForward(Car car, ArrayList<Move> movementList) {
 		movementList.add(Move.REVERSE);
 		movementList.add(Move.BRAKE);
@@ -64,10 +59,14 @@ public class AdjacentMovementControl {
 	}
 	
 	public  ArrayList<Move>  nextMove (int target_x, int target_y) {
-		
 		ArrayList<Move> movementList = new  ArrayList<Move> ();
 		float current_x = car.getX();
 		float current_y = car.getY();
+		if(current_x ==target_x && current_y == target_y) {
+			movementList.add(Move.BRAKE);
+			this.state = State.STOP;
+			return movementList;
+		}
 		
 		
 		// car facing north
@@ -80,7 +79,6 @@ public class AdjacentMovementControl {
 			// right of the car
 			else if(target_x == (current_x+1) && target_y == (current_y)) {
 				MoveToAdjacentRight(car,movementList);
-				return movementList;
 			}
 			// behind of the car
 			else if(target_x == (current_x) && target_y == (current_y-1)) {
@@ -90,7 +88,6 @@ public class AdjacentMovementControl {
 			// left of the car
 			else if(target_x == (current_x-1) && target_y == (current_y)) {
 				MoveToAdjacentLeft(car, movementList);
-				return movementList;
 			}
 		}
 		// car facing east
@@ -100,24 +97,20 @@ public class AdjacentMovementControl {
 			if (target_x == (current_x+1) && target_y == (current_y)){
 
 				MoveToFront(car , movementList);
-				return movementList;
 			}
 			// right of the car
 			else if(target_x == (current_x) && target_y == (current_y-1)) {
 				System.out.println("RIGHT");
 				MoveToAdjacentRight(car,movementList);
-				return movementList;
 			}
 			// behind of the car
 			else if(target_x == (current_x-1) && target_y == (current_y)) {
 				System.out.println("BEHIND");
 				MoveToBehind(car, movementList);
-				return movementList;
 			}
 			// left of the car
 			else if(target_x == (current_x) && target_y == (current_y+1)) {
 				MoveToAdjacentLeft(car, movementList);
-				return movementList;
 				
 	
 			}
@@ -127,22 +120,18 @@ public class AdjacentMovementControl {
 			//in front of the car
 			if (target_x == (current_x) && target_y == (current_y-1)){
 				MoveToFront(car , movementList);
-				return movementList;
 			}
 			// right of the car
 			else if(target_x == (current_x-1) && target_y == (current_y)) {
 				MoveToAdjacentRight(car,movementList);
-				return movementList;
 			}
 			// behind of the car
 			else if(target_x == (current_x) && target_y == (current_y+1)) {
 				MoveToBehind(car, movementList);
-				return movementList;
 			}
 			// left of the car
 			else if(target_x == (current_x+1) && target_y == (current_y)) {
 				MoveToAdjacentLeft(car, movementList);
-				return movementList;
 			}
 		}
 		// car facing west
@@ -150,31 +139,31 @@ public class AdjacentMovementControl {
 			//in front of the car
 			if (target_x == (current_x-1) && target_y == (current_y)){
 				MoveToFront(car , movementList);
-				return movementList;
 			}
 			// right of the car
 			else if(target_x == (current_x) && target_y == (current_y+1)) {
 				MoveToAdjacentRight(car,movementList);
-				return movementList;
 			}
 			// behind of the car
 			else if(target_x == (current_x+1) && target_y == (current_y)) {
 				MoveToBehind(car, movementList);
-				return movementList;
 			}
 			// left of the car
 			else if(target_x == (current_x) && target_y == (current_y-1)) {
 				MoveToAdjacentLeft(car, movementList);
-				return movementList;
 			}
 		}
-		System.out.println("NOT ADJACENT");
 		return movementList;
 	}
 	public ArrayList<Move>  MoveToFront(Car car,ArrayList<Move> movementList) {
 
-		
-		if (this.state == State.FORWARD) {
+		if (this.state == State.REVERSE) {
+			movementList.add(Move.BRAKE);
+			movementList.add(Move.ACCELERATE);
+			this.state = state.FORWARD;
+			return movementList;
+		}
+		else if (this.state == State.FORWARD) {
 			movementList.add(Move.ACCELERATE);
 			this.state = State.FORWARD;
 			return movementList;
@@ -184,11 +173,6 @@ public class AdjacentMovementControl {
 			this.state = State.FORWARD;
 			return movementList;
 
-		}else if (this.state == State.REVERSE) {
-			movementList.add(Move.BRAKE);
-			movementList.add(Move.ACCELERATE);
-			this.state = State.FORWARD;
-			return movementList;
 		}
 		return movementList;
 		
@@ -197,19 +181,18 @@ public class AdjacentMovementControl {
 	
 	public  ArrayList<Move> MoveToBehind(Car car,ArrayList<Move> movementList) {
 
-		
-		if (this.state == State.REVERSE) {
+		if (this.state == State.FORWARD) {
+			movementList.add(Move.BRAKE);
+			movementList.add(Move.REVERSE);
+			this.state = State.REVERSE;
+			return movementList;
+		}
+		else if (this.state == State.REVERSE) {
 			movementList.add(Move.REVERSE);
 			this.state = State.REVERSE;
 			return movementList;
 		}
 		else if (this.state == State.STOP) {			
-			movementList.add(Move.REVERSE);
-			this.state = State.REVERSE;
-			return movementList;
-		}
-		else if(this.state == State.FORWARD) {
-			movementList.add(Move.BRAKE);
 			movementList.add(Move.REVERSE);
 			this.state = State.REVERSE;
 			return movementList;
