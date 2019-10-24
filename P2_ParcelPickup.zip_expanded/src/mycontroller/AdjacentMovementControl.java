@@ -223,7 +223,7 @@ public class AdjacentMovementControl {
 		}
 		else if (this.state  == State.REVERSE) {
 			if(this.checkWallBehind(orientation, currentView)) {
-				BrakeFR(car, movementList);
+				
 				movementList.add(Move.LEFT);
 				this.state = State.REVERSE;
 				return movementList;
@@ -262,12 +262,12 @@ public class AdjacentMovementControl {
 		}
 		else if (this.state == State.FORWARD) {
 			if(this.checkWallAhead(orientation, currentView)) {
-				BrakeRF(car, movementList);
+			
 				movementList.add(Move.RIGHT);
 				this.state = State.FORWARD;
 				return movementList;
 			} else {
-				BrakeRF(car, movementList);
+				
 				movementList.add(Move.RIGHT);
 				this.state = State.FORWARD;
 				return movementList;
@@ -275,12 +275,12 @@ public class AdjacentMovementControl {
 		}
 		else if(this.state  == State.REVERSE) {
 			if(this.checkWallBehind(orientation, currentView)) {
-				BrakeFR(car, movementList);
+		
 				movementList.add(Move.RIGHT);;
 				this.state = State.REVERSE;
 				return movementList;
 			} else {
-				BrakeFR(car, movementList);
+				
 				movementList.add(Move.RIGHT);
 				this.state = State.REVERSE;
 				return movementList;
