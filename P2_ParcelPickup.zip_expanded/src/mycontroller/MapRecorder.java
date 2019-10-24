@@ -24,23 +24,29 @@ public class MapRecorder {
 		maze = new int[MAP_WIDTH][MAP_HEIGHT];
 		map = new MapTile[MAP_WIDTH][MAP_HEIGHT];
 		tileType = new TileType[MAP_WIDTH][MAP_HEIGHT];
+		System.out.println("Instantiating MapRecorder");
 		
 		for (Map.Entry<Coordinate, MapTile> entry : m_hashMap.entrySet()) {
 			int i = entry.getKey().x;
 			int j = entry.getKey().y;
-			
+			//System.out.print("("+String.format("%4s", entry.getKey())+")");
 			map[i][j] = entry.getValue();
 		}
 		
-	
-		for (int i = 0; i<MAP_WIDTH; i++) {
-			for (int j = 0; j< MAP_HEIGHT; j++) {
+		System.out.println("hopefully goes in?");
+		for (int j = MAP_HEIGHT - 1; j>=0; j--) {
+			for (int i = 0; i< MAP_WIDTH; i++) {
 				if(map[i][j].isType(MapTile.Type.WALL)) {
 					maze[i][j] = 100;
+					//System.out.print(MAP_HEIGHT);
+					//System.out.print(map[5][3].getType());
 				} else {
 					maze[i][j] = 0;
 				}
+				System.out.print(String.format("%4s", maze[i][j]));
+				System.out.print(" ");
 			}
+			System.out.print("\n");
 		}
 		
 	}

@@ -88,7 +88,7 @@ public class Car extends Sprite{
 	public void update(float delta0) {
 			float delta=0.25f;
 			if(Simulation.DEBUG_MODE){
-				printDebug();
+				//printDebug();
 			}
 			// logger.info("accelerating: %5s; turning: %5s", accelerating, turning);
 			// Get the current tile

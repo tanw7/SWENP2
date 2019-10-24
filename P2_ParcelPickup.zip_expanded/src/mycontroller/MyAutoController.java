@@ -1,10 +1,7 @@
 package mycontroller;
 
 import controller.CarController;
-import java.util.LinkedList; 
-import java.util.Queue; 
 import mycontroller.AStar.Node;
-import mycontroller.FloodFill.Direction;
 import world.Car;
 import world.World;
 
@@ -15,9 +12,6 @@ import utilities.Coordinate;
 import world.WorldSpatial;
 import java.lang.*;
 import java.util.List;
-
-import com.badlogic.gdx.math.Path;
-
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -26,19 +20,12 @@ public class MyAutoController extends CarController{
 		private int wallSensitivity = 1;
 		private StrategyFactory strategyFactory = StrategyFactory.getInstance();
 		private boolean isFollowingWall = false; // This is set to true when the car starts sticking to a wall.
-		List<Node> path ;
 		
 		// Car Speed to move at
 		private final int CAR_MAX_SPEED = 1;
 		
 		private AStar aStar;
 		private MapRecorder map;
-		private AdjacentMovementControl movementControl;
-		private Queue<Move> queue;
-		
-		public enum Move {
-			ACCELERATE, REVERSE, BRAKE, LEFT, RIGHT
-		}
 		
 		
 		//SubjectBase
@@ -61,26 +48,21 @@ public class MyAutoController extends CarController{
 		public MyAutoController(Car car) {
 			super(car);
 			this.observers = new ArrayList<ControllerListener>();
-			this.movementControl = new AdjacentMovementControl(car, AdjacentMovementControl.State.STOP);
 			map = new MapRecorder(this.getMap());
-			this.queue = new LinkedList<>();
-			test();
 			System.out.println(this.getPosition());
 			String[] coordinates = this.getPosition().split(",");
 			String x = coordinates[0];
 			String y = coordinates[1];
 			aStar = new AStar(map.maze, Integer.parseInt(x), Integer.parseInt(y), false);
-			this.path = aStar.findPathTo(10, 15);
-			System.out.println(map.maze.toString());
-			System.out.println("Starting Point=" + car.getX() + car.getY());
-			this.path.remove(0);
-			if (this.path != null) {
-				 this.path.forEach((n) -> {
-					 
-	                 System.out.print("[" + n.x + ", " + n.y + "] ");
-	                 map.maze[n.y][n.x] = -1;
-		            });
-		            System.out.printf("\nTotal cost: %.02f\n", path.get(path.size() - 1).g);
+			List<Node> path = aStar.findPathTo(5, 1);
+			
+			
+			if (path != null) {
+	            path.forEach((n) -> {
+	                System.out.print("[" + n.x + ", " + n.y + "] ");
+	                map.maze[n.y][n.x] = -1;
+	            });
+	            System.out.printf("\nTotal cost: %.02f\n", path.get(path.size() - 1).g);
 			}
 		}
 		
@@ -92,35 +74,6 @@ public class MyAutoController extends CarController{
 			//strategyFactory.getStrategy().action(); // choose the appropriate strategy, needs an input TBD
 			//publishPropertyEvent("MyAutoController", "mapping", "some value"); //update the map with recent view
 			//System.out.println(this.getPosition());
-//
-//			System.out.printf("BEGIN");
-//			System.out.println("NEXT MOVE:" + "[" + this.path.get(0).x + ", " + this.path.get(0).y + "] ");
-//			movementControl.nextMove(this.path.get(0).x,this.path.get(0).y);
-//			this.path.remove(0);
-//			leftMove();
-		System.out.println(queue.peek());
-		if(queue.peek().equals(Move.ACCELERATE)) {
-			applyForwardAcceleration();
-			queue.remove();
-		}
-		else if(queue.peek().equals(Move.REVERSE)) {
-			applyReverseAcceleration();
-			queue.remove();
-		}
-		else if(queue.peek().equals(Move.BRAKE)) {
-			applyBrake();
-			queue.remove();
-		}
-		else if(queue.peek().equals(Move.RIGHT)) {
-			turnRight();
-			queue.remove();
-		}
-		else if(queue.peek().equals(Move.LEFT)) {
-			System.out.println("Should turn left");
-			turnLeft();
-			queue.remove();
-		}
-			
 		}
 
 		/**
@@ -222,31 +175,4 @@ public class MyAutoController extends CarController{
 			return false;
 		}
 		
-		public Queue<Move> queueGet() {
-			return queue;
-			
-		}
-		public void queueAdd(Move move) {
-			queue.add(move);
-			
-		}
-		
-		public void test() {
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.LEFT);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.LEFT);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.ACCELERATE);
-		}
-		
 	}
-
