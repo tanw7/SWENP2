@@ -63,16 +63,21 @@ class AStar {
             if (this.open.isEmpty()) { // Nothing to examine
                 return null;
             }
+            //System.out.println("crashes here maybe1?");
             this.now = this.open.get(0); // get first node (lowest f score)
             this.open.remove(0); // remove it
             this.closed.add(this.now); // and add to the closed
             addNeigborsToOpenList();
+            //System.out.println("crashes here maybe?2");
         }
+        //System.out.println("crashes here maybe? before now");
         this.path.add(0, this.now);
+        //System.out.println("crashes here maybe?3");
         while (this.now.x != this.xstart || this.now.y != this.ystart) {
             this.now = this.now.parent;
             this.path.add(0, this.now);
         }
+        System.out.println("crashes here maybe?");
         return this.path;
     }
     /*

@@ -150,7 +150,17 @@ public class MyAutoController extends CarController{
         		Coordinate randomTile = map.randomItem(map.list);
         		System.out.println("Moving randomly to:" + randomTile.x +","+ randomTile.y);
         		this.path = aStar.findPathTo(randomTile.x, randomTile.y);
+        		if (map.map[randomTile.x][randomTile.y].getType().equals(MapTile.Type.WALL)) {
+        			System.out.println("WARNING TILE IS WALL");
+        		}else {
+        			System.out.println("WALL TYPE IS: "+map.map[randomTile.x][randomTile.y].getType());
+        		}
+        		
+        		System.out.println("Find path succesfully.");
+        		System.out.println("Size of path is: " + this.path.size());
+        		System.out.println("First tile of path: " + this.path.get(0));
     			this.path.remove(0);
+    			System.out.println("Remove first tile out of queue");
     			if (this.path != null) {
     				 this.path.forEach((n) -> {
     					 //ArrayList<Move> movementList = movementControl.nextMove(n.x, n.y);
