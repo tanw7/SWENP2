@@ -82,9 +82,9 @@ public class MyAutoController extends CarController{
 			if (this.path != null) {
 				 this.path.forEach((n) -> {
 					 ArrayList<Move> movementList = movementControl.nextMove(n.x, n.y);
-					 movementList.forEach((m)->{
-						 System.out.println("MOVEMENT "+m);
-					 });
+					 //movementList.forEach((m)->{
+					 //	 System.out.println("MOVEMENT "+m);
+					 //});
 	                 System.out.print("[" + n.x + ", " + n.y + "] ");
 	                 map.maze[n.y][n.x] = -1;
 		            });
@@ -132,8 +132,12 @@ public class MyAutoController extends CarController{
                }
             }
 			*/
+        	System.out.println("------------------");
+        	System.out.println(movementControl.nextMove(4,5));
+        	System.out.println("------------------");
 
-            System.out.println(removeQueue());
+        	
+            //System.out.println(removeQueue());
             //strategyFactory.getStrategy().action(); // choose the appropriate strategy, needs an input TBD
             //publishPropertyEvent("MyAutoController", "mapping", "some value"); //update the map with recent view
             //System.out.println(this.getPosition());
