@@ -7,6 +7,7 @@ import java.util.Set;
 
 import mycontroller.AStar.Node;
 import mycontroller.FloodFill.Direction;
+import mycontroller.MyAutoController.Move;
 import swen30006.driving.Simulation;
 import world.Car;
 import world.World;
@@ -80,7 +81,10 @@ public class MyAutoController extends CarController{
 			this.path.remove(0);
 			if (this.path != null) {
 				 this.path.forEach((n) -> {
-					 movementControl.nextMove(n.x, n.y);
+					 ArrayList<Move> movementList = movementControl.nextMove(n.x, n.y);
+					 movementList.forEach((m)->{
+						 System.out.println("MOVEMENT "+m);
+					 });
 	                 System.out.print("[" + n.x + ", " + n.y + "] ");
 	                 map.maze[n.y][n.x] = -1;
 		            });
@@ -135,41 +139,7 @@ public class MyAutoController extends CarController{
 		
 		// Coordinate initialGuess;
 		// boolean notSouth = true;
-		@Override
-//		public void update() {
-//			//strategyFactory.getStrategy().action(); // choose the appropriate strategy, needs an input TBD
-//			//publishPropertyEvent("MyAutoController", "mapping", "some value"); //update the map with recent view
-//			//System.out.println(this.getPosition());
-////
-////			System.out.printf("BEGIN");
-////			System.out.println("NEXT MOVE:" + "[" + this.path.get(0).x + ", " + this.path.get(0).y + "] ");
-////			movementControl.nextMove(this.path.get(0).x,this.path.get(0).y);
-////			this.path.remove(0);
-////			leftMove();
-//		System.out.println(queue.peek());
-//		if(queue.peek().equals(Move.ACCELERATE)) {
-//			applyForwardAcceleration();
-//			queue.remove();
-//		}
-//		else if(queue.peek().equals(Move.REVERSE)) {
-//			applyReverseAcceleration();
-//			queue.remove();
-//		}
-//		else if(queue.peek().equals(Move.BRAKE)) {
-//			applyBrake();
-//			queue.remove();
-//		}
-//		else if(queue.peek().equals(Move.RIGHT)) {
-//			turnRight();
-//			queue.remove();
-//		}
-//		else if(queue.peek().equals(Move.LEFT)) {
-//			System.out.println("Should turn left");
-//			turnLeft();
-//			queue.remove();
-//		}
-//			
-//		}
+		
 
 		/**
 		 * Check if you have a wall in front of you!
