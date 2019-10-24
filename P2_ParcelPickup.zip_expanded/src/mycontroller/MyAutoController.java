@@ -40,6 +40,7 @@ public class MyAutoController extends CarController{
 		private MapRecorder map;
 		private AdjacentMovementControl movementControl;
 		private Queue<Move> queue;
+		
 
 		public enum Move {
 			ACCELERATE, REVERSE, BRAKE, LEFT, RIGHT, SKIP
@@ -68,6 +69,7 @@ public class MyAutoController extends CarController{
 			this.observers = new ArrayList<ControllerListener>();
 			this.movementControl = new AdjacentMovementControl(car, AdjacentMovementControl.State.STOP);
 			map = new MapRecorder(this.getMap());
+			map.CarView(getView());
 			//this.queue = new LinkedList<>();
 
 			System.out.println(this.getPosition());
@@ -111,6 +113,11 @@ public class MyAutoController extends CarController{
         }
         
         public Coordinate removeAstar(ArrayList<Coordinate> queue) {
+        	if (queue.isEmpty()) {
+        		
+        		return new Coordinate(0,0);
+        	}
+        	System.out.println("Not empty");
         	return queue.remove(0);
         }
         
@@ -145,17 +152,22 @@ public class MyAutoController extends CarController{
                }
             }
 			*/
+        	
         	//System.out.println(astarQueue);
         	if (movementQueue.isEmpty()) {
         		nextTile = removeAstar(astarQueue);
+        		System.out.println("not crashing yet");
         		System.out.println("Go to tile:" + nextTile.x + "," + nextTile.y);
         		movementList = movementControl.nextMove(nextTile.x, nextTile.y);
+        		
         		for (int i = 0; i < movementList.size(); i++) {
             		addQueue(movementQueue, movementList.get(i));
             	}
         	}
+        	if (!movementQueue.isEmpty()) {
+        		nextStep = removeQueue(movementQueue);
+        	}
         	
-        	nextStep = removeQueue(movementQueue);
         	System.out.println("----------");
         	switch(nextStep) {
 	            case ACCELERATE:
@@ -179,7 +191,8 @@ public class MyAutoController extends CarController{
 		          turnRight();
 		          break;
             }
-        	//System.out.println(movementControl.nextMove(2,4));
+        	map.CarView(getView());
+        	
 
 
         	
@@ -301,22 +314,7 @@ public class MyAutoController extends CarController{
 
 		}
 
-		public void test() {
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.LEFT);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.LEFT);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.ACCELERATE);
-			queue.add(Move.ACCELERATE);
-		}
 		*/
+		
 
 	}
