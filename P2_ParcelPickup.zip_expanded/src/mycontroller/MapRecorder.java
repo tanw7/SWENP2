@@ -42,7 +42,7 @@ public class MapRecorder {
 			map[j][ i] = entry.getValue();
 			map_coord[j][i] = new Coordinate(j,i);
 			if(map[j][i].isType(MapTile.Type.WALL)) {
-				tileType[i][j] = TileType.WALL;	
+				tileType[j][i] = TileType.WALL;	
 			}
 			
 //			System.out.println(String.format("%4s", i + "," +j+ entry.getValue().getType()));
@@ -104,6 +104,17 @@ public class MapRecorder {
 			System.out.print("\n");
 		}
 		System.out.println("_____________________MAZE________________");
+		
+		System.out.println("_____________________TILETYPE________________");
+		for (int i =0; i < MAP_HEIGHT; i++) {
+			for (int j = 0; j <MAP_WIDTH; j++) {
+//				System.out.print(String.format("%4s", map[i][j].getType()));
+				System.out.print(String.format("%4s", tileType[i][j]));
+				System.out.print(" ");
+			}
+			System.out.print("\n");
+		}
+		System.out.println("_____________________TILETYPE________________");
 
 	}
 

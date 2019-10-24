@@ -31,7 +31,7 @@ public class MyAutoController extends CarController{
 		private int wallSensitivity = 1;
 		private StrategyFactory strategyFactory = StrategyFactory.getInstance();
 		private boolean isFollowingWall = false; // This is set to true when the car starts sticking to a wall.
-		List<Node> path ;
+		List<Node> path2 ;
 
 		// Car Speed to move at
 		private final int CAR_MAX_SPEED = 1;
@@ -72,12 +72,12 @@ public class MyAutoController extends CarController{
 			this.movementControl = new AdjacentMovementControl(car, AdjacentMovementControl.State.STOP);
 			map = new MapRecorder(this.getMap());
 			map.CarView(getView());
-			path = new ArrayList<Node>();
-			randomCoordinates.add(new Coordinate(1,18));
+			this.path2 = new ArrayList<Node>();
+			randomCoordinates.add(new Coordinate(18,18));
 			//randomCoordinates.add(new Coordinate(10,4));
-			randomCoordinates.add(new Coordinate(8,10));
-			randomCoordinates.add(new Coordinate(10,3));
-			randomCoordinates.add(new Coordinate(15,4));
+			randomCoordinates.add(new Coordinate(9,10));
+			randomCoordinates.add(new Coordinate(13,3));
+			randomCoordinates.add(new Coordinate(20,4));
 			//this.queue = new LinkedList<>();
 		}
 		
@@ -160,8 +160,9 @@ public class MyAutoController extends CarController{
         		
         		Coordinate randomCoordinate = randomCoordinates.remove(0);
         		System.out.println("Setting path to: " + randomCoordinate.x + "," + randomCoordinate.y);
-        		path = new ArrayList<Node>();
-        		this.path = aStar.findPathTo(randomCoordinate.x, randomCoordinate.y);
+        		System.out.println("BEFORE FIND PATH Size of path is: " + this.path2.size());
+        		this.path2 = aStar.findPathTo(randomCoordinate.x, randomCoordinate.y);
+        		System.out.println("AFTER Size of path is: " + this.path2.size());
         		if (map.map[randomTile.x][randomTile.y].getType().equals(MapTile.Type.WALL)) {
         			System.out.println("WARNING TILE IS WALL");
         		}else {
@@ -169,12 +170,12 @@ public class MyAutoController extends CarController{
         		}
         		
         		System.out.println("Find path succesfully.");
-        		System.out.println("Size of path is: " + this.path.size());
-        		System.out.println("First tile of path: " + this.path.get(0));
-    			this.path.remove(0);
+        		System.out.println("Size of path is: " + this.path2.size());
+        		System.out.println("First tile of path: " + this.path2.get(0));
+    			this.path2.remove(0);
     			System.out.println("Remove first tile out of queue");
-    			if (this.path != null) {
-    				 this.path.forEach((n) -> {
+    			if (this.path2 != null) {
+    				 this.path2.forEach((n) -> {
     					 //ArrayList<Move> movementList = movementControl.nextMove(n.x, n.y);
     					 //movementList.forEach((m)->{
     					 //	 System.out.println("MOVEMENT "+m);
@@ -183,7 +184,7 @@ public class MyAutoController extends CarController{
     	                 System.out.print("[" + n.x + ", " + n.y + "] ");
     	                 map.maze[n.y][n.x] = -1;
     		            });
-    		            System.out.printf("\nTotal cost: %.02f\n", path.get(path.size() - 1).g);
+    		            System.out.printf("\nTotal cost: %.02f\n", path2.get(path2.size() - 1).g);
     			}
         	}
         	//System.out.println(astarQueue);
