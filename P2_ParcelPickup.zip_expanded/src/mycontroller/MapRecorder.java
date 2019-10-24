@@ -50,7 +50,6 @@ public class MapRecorder {
 			}
 		}
 		
-		System.out.println("hopefully goes in?");
 		for (int j = MAP_HEIGHT - 1; j>=0; j--) {
 			for (int i = 0; i< MAP_WIDTH; i++) {
 				//System.out.print(map[i][j].getType());
@@ -109,7 +108,7 @@ public class MapRecorder {
 	
 	
 	public boolean TileOutOfRange(int x, int y) {
-		return (x<0 || x > MAP_WIDTH || y <0 || y > MAP_HEIGHT);
+		return (x<0 || x >= (MAP_WIDTH-1) || y <0 || y >= (MAP_HEIGHT-1));
 	}
 
 

@@ -40,6 +40,7 @@ public class MyAutoController extends CarController{
 		private MapRecorder map;
 		private AdjacentMovementControl movementControl;
 		private Queue<Move> queue;
+		private String[] currentCoordinate;
 		
 
 		public enum Move {
@@ -71,29 +72,9 @@ public class MyAutoController extends CarController{
 			map = new MapRecorder(this.getMap());
 			map.CarView(getView());
 			//this.queue = new LinkedList<>();
-
-			System.out.println(this.getPosition());
-			String[] coordinates = this.getPosition().split(",");
-			String x = coordinates[0];
-			String y = coordinates[1];
-			aStar = new AStar(map.maze, Integer.parseInt(x), Integer.parseInt(y), false);
-			this.path = aStar.findPathTo(10, 15);
-			//System.out.println(map.maze.toString());
-			//System.out.println("Starting Point=" + car.getX() + car.getY());
-			this.path.remove(0);
-			if (this.path != null) {
-				 this.path.forEach((n) -> {
-					 //ArrayList<Move> movementList = movementControl.nextMove(n.x, n.y);
-					 //movementList.forEach((m)->{
-					 //	 System.out.println("MOVEMENT "+m);
-					 //});
-					 addQueue(astarQueue, new Coordinate(n.x, n.y));
-	                 System.out.print("[" + n.x + ", " + n.y + "] ");
-	                 map.maze[n.y][n.x] = -1;
-		            });
-		            System.out.printf("\nTotal cost: %.02f\n", path.get(path.size() - 1).g);
-			}
 		}
+		
+		
 		private ArrayList<Move> movementQueue = new ArrayList<Move>();
 		private ArrayList<Coordinate> astarQueue = new ArrayList<Coordinate>();
 		
@@ -114,11 +95,22 @@ public class MyAutoController extends CarController{
         
         public Coordinate removeAstar(ArrayList<Coordinate> queue) {
         	if (queue.isEmpty()) {
-        		
+        		System.out.println("<<Warning: queue should not be empty.>>");
         		return new Coordinate(0,0);
         	}
-        	System.out.println("Not empty");
         	return queue.remove(0);
+        }
+        
+        private int getCurrentX() {
+        	currentCoordinate = this.getPosition().split(",");
+			String x = currentCoordinate[0];
+			return Integer.parseInt(x);
+        }
+        
+        private int getCurrentY() {
+        	currentCoordinate = this.getPosition().split(",");
+			String y = currentCoordinate[0];
+			return Integer.parseInt(y);
         }
         
         ArrayList<Move> movementList;
@@ -152,11 +144,29 @@ public class MyAutoController extends CarController{
                }
             }
 			*/
-        	
+        	if (astarQueue.isEmpty()) {
+        		System.out.println("A* queue is empty, proceed to get random location.");
+        		aStar = new AStar(map.maze, getCurrentX(), getCurrentY(), false);
+        		Coordinate randomTile = map.randomItem(map.list);
+        		System.out.println("Moving randomly to:" + randomTile.x +","+ randomTile.y);
+        		this.path = aStar.findPathTo(randomTile.x, randomTile.y);
+    			this.path.remove(0);
+    			if (this.path != null) {
+    				 this.path.forEach((n) -> {
+    					 //ArrayList<Move> movementList = movementControl.nextMove(n.x, n.y);
+    					 //movementList.forEach((m)->{
+    					 //	 System.out.println("MOVEMENT "+m);
+    					 //});
+    					 addQueue(astarQueue, new Coordinate(n.x, n.y));
+    	                 System.out.print("[" + n.x + ", " + n.y + "] ");
+    	                 map.maze[n.y][n.x] = -1;
+    		            });
+    		            System.out.printf("\nTotal cost: %.02f\n", path.get(path.size() - 1).g);
+    			}
+        	}
         	//System.out.println(astarQueue);
         	if (movementQueue.isEmpty()) {
         		nextTile = removeAstar(astarQueue);
-        		System.out.println("not crashing yet");
         		System.out.println("Go to tile:" + nextTile.x + "," + nextTile.y);
         		movementList = movementControl.nextMove(nextTile.x, nextTile.y);
         		
@@ -164,9 +174,9 @@ public class MyAutoController extends CarController{
             		addQueue(movementQueue, movementList.get(i));
             	}
         	}
-        	if (!movementQueue.isEmpty()) {
-        		nextStep = removeQueue(movementQueue);
-        	}
+        	
+        	nextStep = removeQueue(movementQueue);
+        	
         	
         	System.out.println("----------");
         	switch(nextStep) {
