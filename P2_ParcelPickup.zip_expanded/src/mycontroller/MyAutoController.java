@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import mycontroller.AStar.Node;
 import mycontroller.FloodFill.Direction;
 import mycontroller.MyAutoController.Move;
 import swen30006.driving.Simulation;
@@ -31,7 +30,7 @@ public class MyAutoController extends CarController{
 		private int wallSensitivity = 1;
 		private StrategyFactory strategyFactory = StrategyFactory.getInstance();
 		private boolean isFollowingWall = false; // This is set to true when the car starts sticking to a wall.
-		List<Node> path2 ;
+		List<Node> path ;
 
 		// Car Speed to move at
 		private final int CAR_MAX_SPEED = 1;
@@ -72,12 +71,12 @@ public class MyAutoController extends CarController{
 			this.movementControl = new AdjacentMovementControl(car, AdjacentMovementControl.State.STOP);
 			map = new MapRecorder(this.getMap());
 			map.CarView(getView());
-			this.path2 = new ArrayList<Node>();
-			randomCoordinates.add(new Coordinate(5,6));
+			path = new ArrayList<Node>();
+			randomCoordinates.add(new Coordinate(22,03));
 			//randomCoordinates.add(new Coordinate(10,4));
-			randomCoordinates.add(new Coordinate(9,10));
-			randomCoordinates.add(new Coordinate(6,3));
-			randomCoordinates.add(new Coordinate(5,4));
+			randomCoordinates.add(new Coordinate(8,10));
+			randomCoordinates.add(new Coordinate(13,3));
+			randomCoordinates.add(new Coordinate(20,4));
 			//this.queue = new LinkedList<>();
 		}
 		
@@ -120,9 +119,18 @@ public class MyAutoController extends CarController{
 			return Integer.parseInt(y);
         }
         
+        private Node coordinateToNode(Coordinate coordinate) {
+        	return new Node(coordinate.y, coordinate.x);
+        }
+        
+        private Coordinate invertY(Coordinate coordinate) {
+        	return new Coordinate(coordinate.x, MapRecorder.MAP_HEIGHT - 1 - coordinate.y);
+        }
+        
         ArrayList<Move> movementList;
         Move nextStep;
         Coordinate nextTile;
+        Boolean findingPath;
         // Coordinate initialGuess;
         // boolean notSouth = true;
         @Override
@@ -153,45 +161,32 @@ public class MyAutoController extends CarController{
 			*/
         	if (astarQueue.isEmpty() && movementQueue.isEmpty()) {
         		System.out.println("A* queue is empty, proceed to get random location.");
-        		aStar = new AStar(map.maze, getCurrentX(), getCurrentY(), false);
-        		System.out.println("Current location:" + getCurrentX() + "," + getCurrentY());
-        		Coordinate randomTile = map.randomItem(randomCoordinates);
-        		//System.out.println("Moving randomly to:" + randomTile.x +","+ randomTile.y);
-        		
-        		Coordinate randomCoordinate = randomCoordinates.remove(0);
-        		System.out.println("Setting path to: " + randomCoordinate.x + "," + randomCoordinate.y);
-        		System.out.println("BEFORE FIND PATH Size of path is: " + this.path2.size());
-        		this.path2 = aStar.findPathTo(randomCoordinate.x, randomCoordinate.y);
-        		System.out.println("AFTER Size of path is: " + this.path2.size());
-        		if (map.map[randomTile.x][randomTile.y].getType().equals(MapTile.Type.WALL)) {
-        			System.out.println("WARNING TILE IS WALL");
-        		}else {
-        			System.out.println("WALL TYPE IS: "+map.map[randomTile.x][randomTile.y].getType());
-        		}
-        		
-        		System.out.println("Find path succesfully.");
-        		System.out.println("Size of path is: " + this.path2.size());
-        		System.out.println("First tile of path: " + this.path2.get(0));
-    			this.path2.remove(0);
-    			System.out.println("Remove first tile out of queue");
-    			if (this.path2 != null) {
-    				 this.path2.forEach((n) -> {
-    					 //ArrayList<Move> movementList = movementControl.nextMove(n.x, n.y);
-    					 //movementList.forEach((m)->{
-    					 //	 System.out.println("MOVEMENT "+m);
-    					 //});
-    					 addQueue(astarQueue, new Coordinate(n.x, n.y));
-    	                 System.out.print("[" + n.x + ", " + n.y + "] ");
-    	                 map.maze[n.y][n.x] = -1;
-    		            });
-    		            System.out.printf("\nTotal cost: %.02f\n", path2.get(path2.size() - 1).g);
-    			}
+        		Coordinate initialCoordinate = new Coordinate(getCurrentX(), MapRecorder.MAP_HEIGHT - 1 - getCurrentY());
+        		Coordinate finalCoordinate = randomCoordinates.remove(0);
+        		finalCoordinate = invertY(finalCoordinate);
+        		Node initialNode = coordinateToNode(initialCoordinate); // y, x
+                Node finalNode = coordinateToNode(finalCoordinate);
+                int rows = MapRecorder.MAP_HEIGHT;
+                int cols = MapRecorder.MAP_WIDTH;
+                AStar aStar = new AStar(rows, cols, initialNode, finalNode);
+                int[][] blocksArray = new int[][]{{5,5},{6,5},{7,5},{8,5},{9,5},{10,5},{11,5},{12,5},{13,5},{14,5},{15,5},{16,5},{17,5},{18,5},{19,5}};
+                aStar.setBlocks(blocksArray);
+                List<Node> path = aStar.findPath();
+                for (Node node : path) {
+                	System.out.println("printing node...");
+                	Coordinate c = new Coordinate(node.getCol(), node.getRow());
+                	addQueue(astarQueue, c);
+                    System.out.println(node);
+                }
+
+    			
         	}
         	//System.out.println(astarQueue);
         	if (movementQueue.isEmpty()) {
         		nextTile = removeAstar(astarQueue);
         		System.out.println("Go to tile:" + nextTile.x + "," + nextTile.y);
         		movementList = movementControl.nextMove(nextTile.x, nextTile.y);
+        		System.out.println("Movement list: " + movementList);
         		if (astarQueue.isEmpty()) { // last one
         			movementControl.Brake(movementList);
         		}
@@ -230,7 +225,7 @@ public class MyAutoController extends CarController{
 		          turnRight();
 		          break;
 	            case SKIP:
-	              	
+	              System.out.println("NOTHING TO DO -> SKIP");	
 	              break;	
 	            	
             }

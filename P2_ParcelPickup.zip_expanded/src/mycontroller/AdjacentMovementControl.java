@@ -30,6 +30,11 @@ public class AdjacentMovementControl {
 		this.state = State.STOP;
 	}
 	
+	public void Brake(ArrayList<Move> movementList) {
+		movementList.add(Move.BRAKE);
+		this.state = State.STOP;
+	}
+	
 	public void ReverseForward(Car car, ArrayList<Move> movementList) {
 		movementList.add(Move.REVERSE);
 		movementList.add(Move.BRAKE);
@@ -59,9 +64,11 @@ public class AdjacentMovementControl {
 	}
 	
 	public  ArrayList<Move>  nextMove (int target_x, int target_y) {
+		//System.out.println("next move is:" + target_x+","+target_y);
+		System.out.println("current location is: " + car.getX()+", "+(MapRecorder.MAP_HEIGHT - 1 - car.getY()));
 		ArrayList<Move> movementList = new  ArrayList<Move> ();
 		float current_x = car.getX();
-		float current_y = car.getY();
+		float current_y = MapRecorder.MAP_HEIGHT - 1 - car.getY();
 		if(current_x ==target_x && current_y == target_y) {
 			movementList.add(Move.BRAKE);
 			this.state = State.STOP;
@@ -72,7 +79,7 @@ public class AdjacentMovementControl {
 		// car facing north
 		if (car.getOrientation().equals(WorldSpatial.Direction.NORTH)) {
 			//in front of the car
-			if (target_x == current_x && target_y == (current_y+1)){
+			if (target_x == current_x && target_y == (current_y-1)){
 				MoveToFront(car , movementList);
 				return movementList;
 			}
@@ -81,7 +88,7 @@ public class AdjacentMovementControl {
 				MoveToAdjacentRight(car,movementList);
 			}
 			// behind of the car
-			else if(target_x == (current_x) && target_y == (current_y-1)) {
+			else if(target_x == (current_x) && target_y == (current_y+1)) {
 				movementList.add(Move.REVERSE);
 				return movementList;
 			}
@@ -99,7 +106,7 @@ public class AdjacentMovementControl {
 				MoveToFront(car , movementList);
 			}
 			// right of the car
-			else if(target_x == (current_x) && target_y == (current_y-1)) {
+			else if(target_x == (current_x) && target_y == (current_y+1)) {
 				System.out.println("RIGHT");
 				MoveToAdjacentRight(car,movementList);
 			}
@@ -109,7 +116,8 @@ public class AdjacentMovementControl {
 				MoveToBehind(car, movementList);
 			}
 			// left of the car
-			else if(target_x == (current_x) && target_y == (current_y+1)) {
+			else if(target_x == (current_x) && target_y == (current_y-1)) {
+				System.out.println("Move to adjacent left");
 				MoveToAdjacentLeft(car, movementList);
 				
 	
@@ -118,7 +126,7 @@ public class AdjacentMovementControl {
 		// car facing south
 		else if (car.getOrientation().equals(WorldSpatial.Direction.SOUTH)) {
 			//in front of the car
-			if (target_x == (current_x) && target_y == (current_y-1)){
+			if (target_x == (current_x) && target_y == (current_y+1)){
 				MoveToFront(car , movementList);
 			}
 			// right of the car
@@ -126,7 +134,7 @@ public class AdjacentMovementControl {
 				MoveToAdjacentRight(car,movementList);
 			}
 			// behind of the car
-			else if(target_x == (current_x) && target_y == (current_y+1)) {
+			else if(target_x == (current_x) && target_y == (current_y-1)) {
 				MoveToBehind(car, movementList);
 			}
 			// left of the car
@@ -141,7 +149,7 @@ public class AdjacentMovementControl {
 				MoveToFront(car , movementList);
 			}
 			// right of the car
-			else if(target_x == (current_x) && target_y == (current_y+1)) {
+			else if(target_x == (current_x) && target_y == (current_y-1)) {
 				MoveToAdjacentRight(car,movementList);
 			}
 			// behind of the car
@@ -149,7 +157,7 @@ public class AdjacentMovementControl {
 				MoveToBehind(car, movementList);
 			}
 			// left of the car
-			else if(target_x == (current_x) && target_y == (current_y-1)) {
+			else if(target_x == (current_x) && target_y == (current_y+1)) {
 				MoveToAdjacentLeft(car, movementList);
 			}
 		}
@@ -418,11 +426,6 @@ public class AdjacentMovementControl {
 			}
 		}
 		return false;
-	}
-
-	public void Brake(ArrayList<Move> movementList) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }
