@@ -1,6 +1,11 @@
 package mycontroller;
 
 import java.util.List;
+
+import com.sun.xml.internal.fastinfoset.algorithm.BuiltInEncodingAlgorithm.WordListener;
+
+import world.World;
+
 import java.util.ArrayList;
 import java.util.Collections;
  
@@ -61,6 +66,7 @@ class AStar {
         addNeigborsToOpenList();
         while (this.now.x != this.xend || this.now.y != this.yend) {
             if (this.open.isEmpty()) { // Nothing to examine
+            		System.out.println("null path found!!!!!!!!!!!!!!");
                 return null;
             }
             //System.out.println("crashes here maybe1?");
@@ -77,7 +83,7 @@ class AStar {
             this.now = this.now.parent;
             this.path.add(0, this.now);
         }
-        //System.out.println("crashes here maybe?");
+        System.out.println("crashes here maybe?");
         return this.path;
     }
     /*
@@ -109,8 +115,8 @@ class AStar {
                 }
                 node = new Node(this.now, this.now.x + x, this.now.y + y, this.now.g, this.distance(x, y));
                 if ((x != 0 || y != 0) // not this.now
-                    && this.now.x + x >= 0 && this.now.x + x < this.maze[0].length // check maze boundaries
-                    && this.now.y + y >= 0 && this.now.y + y < this.maze.length
+                    && this.now.x + x >= 0 && this.now.x + x < this.maze.length // check maze boundaries
+                    && this.now.y + y >= 0 && this.now.y + y < this.maze[0].length
                     && this.maze[this.now.x + x][this.now.y + y] != -1 // check if square is walkable
                     && !findNeighborInList(this.open, node) && !findNeighborInList(this.closed, node)) { // if not already done
                         node.g = node.parent.g + 1.; // Horizontal/vertical cost = 1.0
