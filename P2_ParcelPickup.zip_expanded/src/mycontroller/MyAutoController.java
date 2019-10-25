@@ -26,6 +26,7 @@ import com.badlogic.gdx.math.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 
+
 public class MyAutoController extends CarController{
 		// How many minimum units the wall is away from the player.
 		private int wallSensitivity = 1;
@@ -41,6 +42,9 @@ public class MyAutoController extends CarController{
 		private AdjacentMovementControl movementControl;
 		private Queue<Move> queue;
 		private String[] currentCoordinate;
+		public static boolean goToParcel = false;
+		public static boolean findAllParcel = false;
+		public int targetX, targetY;
 		
 
 		public enum Move {
@@ -118,26 +122,149 @@ public class MyAutoController extends CarController{
         ArrayList<Move> movementList;
         Move nextStep;
         Coordinate nextTile;
+        
+
+        
         // Coordinate initialGuess;
         // boolean notSouth = true;
         @Override
         public void update() {
         
         	map.CarView(getView());
+        
+        	if(!map.ParcelList.isEmpty()) {
+        		targetX = map.ParcelList.get(0).x;
+        		targetY = map.ParcelList.get(0).y;
+        	}
         	
-        	if (astarQueue.isEmpty()) {
+        	if(this.numParcelsFound() == this.numParcels() && astarQueue.isEmpty()) {
+        		System.out.println("found all Parcel!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        		findAllParcel = true;
+        		goToParcel = true;
+        		if(!astarQueue.isEmpty()) {
+        			astarQueue.clear();
+        			movementQueue.clear();
+        		} 
+        		aStar = new AStar(map.maze, getCurrentX(), getCurrentY(), false);
+        		this.path = aStar.findPathTo(map.finishX, map.finishY);
+        		System.out.println(map.finishX +"," + map.finishY);
+        		
+        		System.out.println("TO EXIT");
+        	}
+        	
+        	else if(astarQueue.isEmpty() && map.ParcelList.isEmpty() && !findAllParcel) {
+        		System.out.println("A* queue is empty, proceed to get random location.");
+        		aStar = new AStar(map.maze, getCurrentX(), getCurrentY(), false);
+        		
+        		Coordinate randomTile = map.randomItem(map.list);
+        		System.out.println("list size is " + map.list.size());
+        		System.out.println("Moving randomly to:" + randomTile.x +","+ randomTile.y);
+        		this.path = aStar.findPathTo(randomTile.x, randomTile.y);
+        		if (map.map[randomTile.x][randomTile.y].getType().equals(MapTile.Type.WALL)) {
+        			System.out.println("WARNING TILE IS WALL");
+        		}else {
+        			System.out.println("WALL TYPE IS: "+map.map[randomTile.x][randomTile.y].getType());
+        		}
+        		System.out.println("Find path succesfully.");
+        	 	//System.out.println("First tile of path: " + this.path.get(0));
+    			//this.path.remove(0);
+    			System.out.println("Remove first tile out of queue");
+    			if (this.path != null) {
+    				 this.path.forEach((n) -> {
+    					 //ArrayList<Move> movementList = movementControl.nextMove(n.x, n.y);
+    					 //movementList.forEach((m)->{
+    					 //	 System.out.println("MOVEMENT "+m);
+    					 //});
+    					 addQueue(astarQueue, new Coordinate(n.x, n.y));
+    	                 System.out.print("[" + n.x + ", " + n.y + "] ");
+
+    		            });
+    		            System.out.printf("\nTotal cost: %.02f\n", path.get(path.size() - 1).g);
+    			}
+        	}
+        	else	 if(!map.ParcelList.isEmpty() && !goToParcel) {
+
+        		goToParcel = true;
+        		System.out.println("There is a parcel in arraylist go to that parcel");
+        		if(!astarQueue.isEmpty()) {
+        			astarQueue.clear();
+    				movementQueue.clear();
+        		}
+    			aStar = new AStar(map.maze, getCurrentX(), getCurrentY(), false);
+    			this.path = aStar.findPathTo(targetX, targetY);
+    			
+    			if(this.path==null) {
+    				map.DeleteFromParcelList(targetX, targetY, map.ParcelList);
+    				System.out.println("cant find path to this parcel try random coord");
+    				Coordinate randomTile = map.randomItem(map.list);
+                	System.out.println("list size is " + map.list.size());
+                	System.out.println("Moving randomly to:" + randomTile.x +","+ randomTile.y);
+                	this.path = aStar.findPathTo(randomTile.x, randomTile.y);
+                	if (map.map[randomTile.x][randomTile.y].getType().equals(MapTile.Type.WALL)) {
+                		System.out.println("WARNING TILE IS WALL");
+                	}else {
+                		System.out.println("WALL TYPE IS: "+map.map[randomTile.x][randomTile.y].getType());
+                	}
+    			}
+    		 	//System.out.println("First tile of path: " + this.path.get(0));
+    			//this.path.remove(0);
+    			System.out.println("Remove first tile out of queue");
+    			if (this.path != null) {
+    				 this.path.forEach((n) -> {
+    					 //ArrayList<Move> movementList = movementControl.nextMove(n.x, n.y);
+    					 //movementList.forEach((m)->{
+    					 //	 System.out.println("MOVEMENT "+m);
+    					 //});
+    					 addQueue(astarQueue, new Coordinate(n.x, n.y));
+    	                 System.out.print("[" + n.x + ", " + n.y + "] ");
+
+    		            });
+    		            System.out.printf("\nTotal cost: %.02f\n", path.get(path.size() - 1).g);
+    			}
+    				
+        	}
+        	
+     
+        
+        	
+        	if(this.getCurrentX() == targetX && this.getCurrentY() == targetY) {
+        		goToParcel = false;
+        		astarQueue.clear();
+        		movementList.clear();
+        		map.DeleteFromParcelList(targetX, targetY, map.ParcelList);
+        		targetX = 0; 
+        		targetY = 0;
+        	}
+
+        
+        	
+        	
+        /*if (astarQueue.isEmpty()) {
         		System.out.println("A* queue is empty, proceed to get random location.");
         		aStar = new AStar(map.maze, getCurrentX(), getCurrentY(), false);
            	System.out.println("list size is " + map.ParcelList.size());
         		if(!map.ParcelList.isEmpty()) {
-        			System.out.println("go to parcel path");
         			this.path = aStar.findPathTo(map.ParcelList.get(0).x, map.ParcelList.get(0).y);
-        			System.out.println(map.ParcelList.get(0).x + "" + map.ParcelList.get(0).y);
+        			System.out.println("go to parcel at"+ map.ParcelList.get(0).x + "," + map.ParcelList.get(0).y);
         			if(path==null) {
-        				map.DeleteFromParcelList(map.ParcelList.get(0).x, map.ParcelList.get(0).y, map.ParcelList);
-        				this.path = aStar.findPathTo(map.ParcelList.get(0).x, map.ParcelList.get(0).y);
+        				if(!map.ParcelList.isEmpty()) {
+        					map.DeleteFromParcelList(map.ParcelList.get(0).x, map.ParcelList.get(0).y, map.ParcelList);
+        					System.out.println("now parcel size is "+ map.ParcelList.size());
+            				//this.path = aStar.findPathTo(map.ParcelList.get(0).x, map.ParcelList.get(0).y);
+        				} else {
+        					Coordinate randomTile = map.randomItem(map.list);
+                    		System.out.println("list size is " + map.list.size());
+                    		System.out.println("Moving randomly to:" + randomTile.x +","+ randomTile.y);
+                    		this.path = aStar.findPathTo(randomTile.x, randomTile.y);
+                    		if (map.map[randomTile.x][randomTile.y].getType().equals(MapTile.Type.WALL)) {
+                    			System.out.println("WARNING TILE IS WALL");
+                    		}else {
+                    			System.out.println("WALL TYPE IS: "+map.map[randomTile.x][randomTile.y].getType());
+                    		}
+        				}
+        				
         			}
-        			map.DeleteFromParcelList(map.ParcelList.get(0).x, map.ParcelList.get(0).y, map.ParcelList);
+        			//map.DeleteFromParcelList(map.ParcelList.get(0).x, map.ParcelList.get(0).y, map.ParcelList);
         		} else {
             		Coordinate randomTile = map.randomItem(map.list);
             		System.out.println("list size is " + map.list.size());
@@ -149,13 +276,6 @@ public class MyAutoController extends CarController{
             			System.out.println("WALL TYPE IS: "+map.map[randomTile.x][randomTile.y].getType());
             		}
         		}
-
-        		/*if(this.path==null) {
-        			map.DeleteFromList(randomTile.x, randomTile.y, map.list);
-        			Coordinate randomTiles = map.randomItem(map.list);
-        			System.out.println(randomTiles.x+ "   " + randomTiles.y);
-        			this.path = aStar.findPathTo(randomTiles.x, randomTiles.y);
-        		}*/
 
         		System.out.println("Find path succesfully.");
 
@@ -174,7 +294,7 @@ public class MyAutoController extends CarController{
     		            });
     		            System.out.printf("\nTotal cost: %.02f\n", path.get(path.size() - 1).g);
     			}
-        	}
+        	}*/
         	
         	//System.out.println(astarQueue);
         	if (movementQueue.isEmpty()) {
