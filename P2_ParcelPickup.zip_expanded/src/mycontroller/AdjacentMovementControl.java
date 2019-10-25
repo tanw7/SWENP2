@@ -62,12 +62,12 @@ public class AdjacentMovementControl {
 		ArrayList<Move> movementList = new  ArrayList<Move> ();
 		float current_x = car.getX();
 		float current_y = car.getY();
-		if(current_x ==target_x && current_y == target_y) {
+		
+		if(current_x == target_x && current_y == target_y) {
 			movementList.add(Move.BRAKE);
 			this.state = State.STOP;
 			return movementList;
 		}
-		
 		
 		// car facing north
 		if (car.getOrientation().equals(WorldSpatial.Direction.NORTH)) {
@@ -157,13 +157,8 @@ public class AdjacentMovementControl {
 	}
 	public ArrayList<Move>  MoveToFront(Car car,ArrayList<Move> movementList) {
 
-		if (this.state == State.REVERSE) {
-			movementList.add(Move.BRAKE);
-			movementList.add(Move.ACCELERATE);
-			this.state = state.FORWARD;
-			return movementList;
-		}
-		else if (this.state == State.FORWARD) {
+		
+		if (this.state == State.FORWARD) {
 			movementList.add(Move.ACCELERATE);
 			this.state = State.FORWARD;
 			return movementList;
@@ -173,6 +168,11 @@ public class AdjacentMovementControl {
 			this.state = State.FORWARD;
 			return movementList;
 
+		} else if (this.state == State.REVERSE) {
+			movementList.add(Move.BRAKE);
+			movementList.add(Move.ACCELERATE);
+			this.state = State.FORWARD;
+			return movementList;
 		}
 		return movementList;
 		
@@ -181,18 +181,18 @@ public class AdjacentMovementControl {
 	
 	public  ArrayList<Move> MoveToBehind(Car car,ArrayList<Move> movementList) {
 
-		if (this.state == State.FORWARD) {
-			movementList.add(Move.BRAKE);
-			movementList.add(Move.REVERSE);
-			this.state = State.REVERSE;
-			return movementList;
-		}
-		else if (this.state == State.REVERSE) {
+		
+		if (this.state == State.REVERSE) {
 			movementList.add(Move.REVERSE);
 			this.state = State.REVERSE;
 			return movementList;
 		}
 		else if (this.state == State.STOP) {			
+			movementList.add(Move.REVERSE);
+			this.state = State.REVERSE;
+			return movementList;
+		} else if (this.state == State.FORWARD) {
+			movementList.add(Move.BRAKE);
 			movementList.add(Move.REVERSE);
 			this.state = State.REVERSE;
 			return movementList;
@@ -418,11 +418,6 @@ public class AdjacentMovementControl {
 			}
 		}
 		return false;
-	}
-
-	public void Brake(ArrayList<Move> movementList) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }
