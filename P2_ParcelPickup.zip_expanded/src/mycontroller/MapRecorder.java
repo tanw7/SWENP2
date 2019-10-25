@@ -24,6 +24,8 @@ public class MapRecorder {
 	public ArrayList<Coordinate> ParcelList;
 	public Coordinate coordinate;
 	public Random rand;
+	public int finishX;
+	public int finishY;
 
 	public static final int MAP_WIDTH = World.MAP_WIDTH;
 	public static final int MAP_HEIGHT = World.MAP_HEIGHT;
@@ -46,6 +48,9 @@ public class MapRecorder {
 
 			if(map[i][j].isType(MapTile.Type.WALL)) {
 				tileType[i][j] = TileType.WALL;
+			} else if(map[i][j].isType(MapTile.Type.FINISH)) {
+				finishX = i;
+				finishY = j;
 			}
 		}
 
@@ -105,11 +110,12 @@ public class MapRecorder {
 
 	public void addToParcelList(int x, int y, ArrayList<Coordinate> ParcelList) {
 		ParcelList.add(new Coordinate(x, y));
-		System.out.println(ParcelList.get(0).x);
+		System.out.println("new parcel found at "+ x + "," + y);
 	}
 
 	public void DeleteFromParcelList(int x, int y, ArrayList<Coordinate> ParcelList) {
 		ParcelList.remove(new Coordinate(x,y));
+		System.out.println("remove parcel at "+ x + "," + y);
 	}
 	
 	public void addToList(int x, int y, ArrayList<Coordinate> list) {
